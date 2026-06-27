@@ -1,0 +1,19 @@
+{
+  "name": "@toolbox/svg-render",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "license": "BSD-3-Clause",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@toolbox/svg-core": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  }
+}
