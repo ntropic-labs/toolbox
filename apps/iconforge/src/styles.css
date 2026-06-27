@@ -1,0 +1,2043 @@
+@import 'tailwindcss';
+@import '@toolbox/ui/styles/tokens.css';
+@source "../../../packages/ui/src";
+
+:root {
+  color-scheme: dark;
+  background: #050609;
+  font-family:
+    'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #050609;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.if-app {
+  --if-bg: #050609;
+  --if-bg-2: #090d14;
+  --if-panel: #11151d;
+  --if-panel-2: #171c25;
+  --if-panel-3: #202631;
+  --if-border: #2a303b;
+  --if-border-strong: #3a414e;
+  --if-text: #f4f0ec;
+  --if-muted: #aaa39c;
+  --if-subtle: #777f8b;
+  --if-primary: #ff7a66;
+  --if-primary-hover: #ff927f;
+  --if-primary-text: #170706;
+  --if-gold: #e8b84a;
+  --if-gold-hover: #f0c868;
+  --if-danger: #d85d6a;
+  --if-danger-hover: #e87580;
+  --if-focus: #e8b84a;
+  --if-input: #0c1118;
+  --if-canvas-bg: #0b0f16;
+  color-scheme: dark;
+  display: grid;
+  min-height: 100vh;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  overflow-x: hidden;
+  background: var(--if-bg);
+  color: var(--if-text);
+  padding: 14px;
+  font-family:
+    'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    monospace;
+}
+
+.if-app[data-theme='light'] {
+  --if-bg: #ffffff;
+  --if-bg-2: #f7f8fa;
+  --if-panel: #ffffff;
+  --if-panel-2: #f1f3f6;
+  --if-panel-3: #e7eaee;
+  --if-border: #d6dbe2;
+  --if-border-strong: #aeb6c1;
+  --if-text: #1c2027;
+  --if-muted: #59616c;
+  --if-subtle: #7b8490;
+  --if-primary: #e45f4f;
+  --if-primary-hover: #cc493c;
+  --if-primary-text: #ffffff;
+  --if-gold: #a87506;
+  --if-gold-hover: #8d6104;
+  --if-danger: #ba3949;
+  --if-danger-hover: #9f2f3d;
+  --if-focus: #b37a07;
+  --if-input: #ffffff;
+  --if-canvas-bg: #f1f3f6;
+  color-scheme: light;
+}
+
+.if-header,
+.if-editor-body {
+  width: min(100%, 1180px);
+  margin-inline: auto;
+}
+
+.if-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  min-height: 68px;
+  border-bottom: 1px solid var(--if-border);
+  padding-block: 10px;
+}
+
+.if-brand {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.if-brand-mark {
+  display: block;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+}
+
+.if-brand-mark-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The logo's white rounded backdrop: hidden in light theme (anvil sits on the page),
+   shown in dark theme so the dark anvil reads against it. */
+.if-logo-bg {
+  display: none;
+}
+
+.if-app[data-theme='dark'] .if-logo-bg {
+  display: block;
+}
+
+.if-brand-copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.if-brand strong {
+  color: var(--if-text);
+  font-size: 26px;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.if-brand-description {
+  overflow: hidden;
+  color: var(--if-muted);
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.if-dock-note {
+  color: var(--if-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.if-preview-toolbar {
+  display: grid;
+  width: var(--if-stage-w);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.if-toolbar-actions {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+}
+
+.if-toolbar-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.if-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.if-header-actions {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.if-button {
+  /* Self-sufficient row layout so plain .if-button elements (not just the <Button>
+     component) keep their icon + label on one line, even with Tailwind's block svgs. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  border: 1px solid var(--if-border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: var(--if-panel-2);
+  color: var(--if-text);
+  box-shadow: none;
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: nowrap;
+  outline: none;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.if-button svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.if-button:hover:not(:disabled) {
+  border-color: var(--if-border-strong);
+  background: var(--if-panel-3);
+}
+
+.if-button:focus-visible,
+.if-repo-link:focus-visible,
+.if-theme-switch:focus-visible,
+.if-layer-row-select:focus-visible,
+.if-layer-action:focus-visible,
+.if-create-toggle:focus-visible,
+.if-input:focus-visible {
+  outline: 2px solid var(--if-focus);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+.if-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.if-button-primary {
+  border-color: var(--if-primary);
+  background: var(--if-primary);
+  color: var(--if-primary-text);
+}
+
+.if-button-primary:hover:not(:disabled) {
+  border-color: var(--if-primary-hover);
+  background: var(--if-primary-hover);
+  color: var(--if-primary-text);
+}
+
+.if-button-secondary {
+  border-color: var(--if-border);
+  background: var(--if-panel-2);
+  color: var(--if-text);
+}
+
+.if-button-ghost {
+  border-color: transparent;
+  background: transparent;
+  color: var(--if-muted);
+}
+
+.if-button-danger {
+  border-color: var(--if-danger);
+  background: transparent;
+  color: var(--if-danger);
+}
+
+.if-button-danger:hover:not(:disabled) {
+  border-color: var(--if-danger-hover);
+  background: color-mix(in srgb, var(--if-danger) 14%, transparent);
+  color: var(--if-danger-hover);
+}
+
+.if-repo-link {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--if-border);
+  border-radius: 9px;
+  color: var(--if-muted);
+  font-size: 13px;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+
+.if-repo-link:hover {
+  border-color: var(--if-border-strong);
+  color: var(--if-text);
+}
+
+.if-github-icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  fill: currentColor;
+}
+
+.if-theme-switch {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  width: 70px;
+  min-height: 38px;
+  border: 1px solid var(--if-border);
+  border-radius: 9px;
+  background: var(--if-panel-2);
+  color: var(--if-muted);
+  cursor: pointer;
+  outline: none;
+  padding: 4px;
+}
+
+.if-theme-switch:hover {
+  border-color: var(--if-border-strong);
+  background: var(--if-panel-3);
+}
+
+.if-theme-icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+
+.if-theme-svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.if-theme-svg path:first-child {
+  fill: currentColor;
+}
+
+.if-theme-thumb {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: 30px;
+  border: 1px solid var(--if-primary);
+  border-radius: 7px;
+  background: var(--if-primary);
+  transition:
+    transform 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.if-theme-switch[aria-checked='true'] .if-theme-thumb {
+  border-color: var(--if-gold);
+  background: var(--if-gold);
+  transform: translateX(32px);
+}
+
+.if-theme-switch[aria-checked='false'] .if-theme-icon:first-child,
+.if-theme-switch[aria-checked='true'] .if-theme-icon:last-child {
+  color: var(--if-primary-text);
+}
+
+.if-editor-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+  align-items: stretch;
+  gap: 20px;
+  min-height: 0;
+}
+.if-preview-column {
+  /* Stage width: fill the column, but never taller than the viewport (the canvas is square),
+     so the canvas/toolbar/export share one width and the column starts at the top. */
+  --if-stage-w: min(100%, calc(100vh - 196px));
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  align-content: start;
+  justify-items: center;
+  gap: 10px;
+}
+
+.if-preview {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  place-items: center;
+}
+
+.if-canvas-frame {
+  width: var(--if-stage-w);
+  max-height: none;
+  aspect-ratio: 1;
+  border: 1px solid var(--if-border);
+  border-radius: 10px;
+  background: var(--if-panel);
+  padding: clamp(10px, 1.8vw, 18px);
+}
+
+.if-canvas-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--if-canvas-bg);
+}
+
+.if-canvas-stage[data-transparent='true'] {
+  background-color: #f7f8fa;
+  background-image:
+    linear-gradient(45deg, #c9ced6 25%, transparent 25%),
+    linear-gradient(-45deg, #c9ced6 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #c9ced6 75%),
+    linear-gradient(-45deg, transparent 75%, #c9ced6 75%);
+  background-position:
+    0 0,
+    0 8px,
+    8px -8px,
+    -8px 0;
+  background-size: 16px 16px;
+}
+
+.if-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+.if-safe-guide {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+
+.if-safe-guide > div {
+  position: absolute;
+}
+
+/* The guaranteed-visible Android adaptive safe zone: keep key content inside it. */
+.if-safe-circle {
+  border: 2px dashed color-mix(in srgb, var(--if-danger) 80%, transparent);
+  border-radius: 50%;
+}
+
+/* The mask viewport: content outside this can be clipped by some launcher masks. */
+.if-safe-mask {
+  border: 2px dashed color-mix(in srgb, var(--if-danger) 62%, transparent);
+  border-radius: 8%;
+}
+
+/* On-canvas selection chrome for the active layer (indicative only, no drag). */
+.if-selection {
+  position: absolute;
+  border: 1.5px dashed var(--if-primary);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.if-selection-handle {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  background: var(--if-primary);
+}
+
+.if-selection-handle[data-corner='tl'] {
+  top: -4px;
+  left: -4px;
+}
+
+.if-selection-handle[data-corner='tr'] {
+  top: -4px;
+  right: -4px;
+}
+
+.if-selection-handle[data-corner='bl'] {
+  bottom: -4px;
+  left: -4px;
+}
+
+.if-selection-handle[data-corner='br'] {
+  bottom: -4px;
+  right: -4px;
+}
+
+.if-mode-toggle {
+  display: flex;
+  /* Fill the toolbar's 1fr column like the mockup; the modes sit left of the track. */
+  gap: 2px;
+  border: 1px solid var(--if-border);
+  border-radius: 9px;
+  background: var(--if-input);
+  padding: 3px;
+}
+
+.if-mode-option {
+  min-height: 30px;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 11px;
+  background: transparent;
+  color: var(--if-muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.if-seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 2px;
+  border: 1px solid var(--if-border);
+  border-radius: 9px;
+  background: var(--if-input);
+  padding: 3px;
+}
+
+.if-seg-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 11px;
+  background: transparent;
+  color: var(--if-muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.if-mode-option:hover,
+.if-seg-item:hover {
+  color: var(--if-text);
+}
+
+.if-mode-option[aria-pressed='true'],
+.if-mode-option[data-state='on'],
+.if-seg-item[data-state='on'],
+.if-seg-item[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--if-primary) 16%, var(--if-panel));
+  color: var(--if-text);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--if-primary) 52%, transparent);
+}
+
+.if-mode-option:focus-visible,
+.if-seg-item:focus-visible {
+  outline: 2px solid var(--if-focus);
+  outline-offset: -2px;
+}
+
+.if-iconbtn {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--if-border);
+  border-radius: 8px;
+  background: var(--if-panel-2);
+  color: var(--if-muted);
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.if-iconbtn:hover:not(:disabled) {
+  border-color: var(--if-border-strong);
+  color: var(--if-text);
+}
+
+.if-iconbtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.if-iconbtn:focus-visible {
+  outline: 2px solid var(--if-focus);
+  outline-offset: 2px;
+}
+
+.if-iconbtn svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* One unified card: the toolbar, the code, and any diagnostics share a single
+   bordered, rounded box (the editor inside is flush, not its own box). */
+.if-code-view {
+  display: grid;
+  width: var(--if-stage-w);
+  aspect-ratio: 1;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  /* Clamp the editor column to the box: minmax(0, …) overrides the grid item's min-content
+     minimum so CodeMirror's long lines can't blow the column out over the dock. */
+  grid-template-columns: minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--if-border);
+  border-radius: 10px;
+  background: var(--if-panel);
+}
+
+.if-code-toolbar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--if-border);
+}
+
+/* Code-toolbar buttons are compact (the mockup's small ghost/secondary). */
+.if-code-toolbar .if-button {
+  min-height: 28px;
+  padding: 4px 9px;
+  font-size: 12px;
+}
+
+/* The generated-component name sits left; the Copy button is pushed to the right. */
+.if-code-name {
+  margin-right: auto;
+  color: var(--if-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* The "Remove hidden" switch sits at the right end of the code toolbar, away from the actions. */
+.if-code-toolbar .if-toggle {
+  margin-left: auto;
+  white-space: nowrap;
+  font-size: 11.5px;
+}
+
+/* CodeMirror mounts inside a .cm-theme-{light,dark} wrapper div; clamp it to the editor cell
+   and let long lines scroll inside rather than widen the column. */
+.if-code-view > [class*='cm-theme'] {
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.if-code-view .cm-editor {
+  max-width: 100%;
+}
+
+.if-code-editor {
+  width: 100%;
+  height: 100%;
+  resize: none;
+  padding: 14px 16px;
+  background: var(--if-panel);
+  color: var(--if-text);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  tab-size: 2;
+}
+
+.if-code-editor:focus-visible {
+  outline: 2px solid var(--if-focus);
+  outline-offset: -2px;
+}
+
+.if-code-diagnostics {
+  margin: 0;
+  padding: 8px 10px;
+  list-style: none;
+  border: 1px solid var(--if-danger);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--if-danger) 12%, transparent);
+  color: var(--if-danger);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.if-code-diagnostics li + li {
+  margin-top: 4px;
+}
+
+.if-adjust-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+/* The dock is a column of cards now, not one bordered panel. */
+.if-dock {
+  min-width: 0;
+  min-height: 0;
+  max-height: calc(100vh - 92px);
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  overflow: auto;
+}
+
+/* ---- card + section primitives (shared by dock, export) ---- */
+.if-card {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--if-border);
+  border-radius: 10px;
+  background: var(--if-panel);
+  padding: 13px 14px;
+}
+
+.if-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.if-seclabel {
+  color: var(--if-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.if-subhead {
+  color: var(--if-muted);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.if-subhead-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.if-note {
+  margin: 0;
+  color: var(--if-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.if-note b {
+  color: var(--if-text);
+  font-weight: 600;
+}
+
+/* ---- pills ---- */
+.if-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.if-pill-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.if-pill-muted {
+  border: 1px solid var(--if-border);
+  background: var(--if-panel-2);
+  color: var(--if-muted);
+}
+
+.if-pill-ember {
+  background: color-mix(in srgb, var(--if-primary) 15%, transparent);
+  color: var(--if-primary);
+}
+
+.if-pill-tiny {
+  padding: 2px 6px;
+  font-size: 8.5px;
+  letter-spacing: 0.1em;
+}
+
+/* ---- toggle switch (track + knob over a focusable checkbox) ---- */
+.if-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--if-text);
+  font-size: 12.5px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.if-toggle-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+}
+
+.if-toggle-track {
+  position: relative;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 20px;
+  border: 1px solid var(--if-border-strong);
+  border-radius: 999px;
+  background: var(--if-panel-3);
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.if-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--if-muted);
+  transition:
+    left 150ms ease,
+    background-color 150ms ease;
+}
+
+.if-toggle[data-on] .if-toggle-track {
+  border-color: var(--if-primary);
+  background: color-mix(in srgb, var(--if-primary) 32%, var(--if-panel-3));
+}
+
+.if-toggle[data-on] .if-toggle-knob {
+  left: 16px;
+  background: var(--if-primary);
+}
+
+.if-toggle[data-disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.if-toggle-input:focus-visible + .if-toggle-track {
+  outline: 2px solid var(--if-focus);
+  outline-offset: 2px;
+}
+
+.if-document-controls {
+  display: grid;
+  gap: 10px;
+}
+
+.if-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.if-info {
+  display: inline-grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  border: 1px solid var(--if-border-strong);
+  border-radius: 50%;
+  color: var(--if-muted);
+  font-size: 9px;
+  font-style: normal;
+  line-height: 1;
+  cursor: help;
+}
+
+.if-doc-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.if-doc-actions .if-button {
+  width: 100%;
+}
+
+.if-open-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+/* ---- Open project library (Popover panel) ---- */
+.if-project-popover {
+  display: grid;
+  gap: 2px;
+  width: min(320px, calc(100vw - 36px));
+  border: 1px solid var(--if-border-strong);
+  border-radius: 10px;
+  background: var(--if-panel);
+  box-shadow: 0 18px 40px -16px rgb(0 0 0 / 55%);
+  padding: 6px;
+}
+
+.if-menu-head {
+  padding: 8px 9px 5px;
+  color: var(--if-muted);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.if-project-list {
+  display: grid;
+  gap: 2px;
+  max-height: 280px;
+  overflow: auto;
+}
+
+.if-proj {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding-right: 6px;
+}
+
+.if-proj:hover,
+.if-proj:focus-within {
+  border-color: var(--if-border);
+  background: var(--if-panel-2);
+}
+
+.if-proj[data-active='true'] {
+  border-color: color-mix(in srgb, var(--if-primary) 45%, var(--if-border));
+  background: color-mix(in srgb, var(--if-primary) 12%, transparent);
+}
+
+.if-proj-open {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--if-text);
+  cursor: pointer;
+  padding: 7px 8px;
+  text-align: left;
+  font: inherit;
+}
+
+.if-proj-thumb {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border: 1px solid var(--if-border);
+  border-radius: 7px;
+  background: var(--if-canvas-bg);
+}
+
+.if-proj-meta {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.if-proj-meta b {
+  overflow: hidden;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.if-proj-meta span {
+  color: var(--if-muted);
+  font-size: 10.5px;
+}
+
+.if-proj-end {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  min-width: 26px;
+}
+
+.if-proj-check {
+  display: grid;
+  place-items: center;
+  color: var(--if-primary);
+}
+
+.if-proj-check svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.if-proj-actions {
+  display: flex;
+  gap: 1px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.if-proj:hover .if-proj-actions,
+.if-proj:focus-within .if-proj-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* The check yields to the actions on hover so the row never crowds. */
+.if-proj:hover .if-proj-check,
+.if-proj:focus-within .if-proj-check {
+  display: none;
+}
+
+.if-proj-act {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--if-muted);
+  cursor: pointer;
+}
+
+.if-proj-act:hover {
+  background: var(--if-panel-3);
+  color: var(--if-text);
+}
+
+.if-proj-act-danger:hover {
+  color: var(--if-danger);
+}
+
+.if-proj-act:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.if-proj-act svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.if-proj-act:focus-visible,
+.if-proj-open:focus-visible,
+.if-menu-row:focus-visible {
+  outline: 2px solid var(--if-focus);
+  outline-offset: -2px;
+}
+
+.if-menu-sep {
+  height: 1px;
+  margin: 5px 4px;
+  background: var(--if-border);
+}
+
+.if-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--if-muted);
+  cursor: pointer;
+  padding: 8px;
+  text-align: left;
+  font: inherit;
+  font-size: 12.5px;
+}
+
+.if-menu-row:hover {
+  background: var(--if-panel-2);
+  color: var(--if-text);
+}
+
+.if-menu-row svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.if-menu-foot {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 9px 3px;
+  color: var(--if-muted);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.if-menu-foot svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
+
+/* ---- confirm modal (irreversible actions) ---- */
+.if-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: color-mix(in srgb, #000 55%, transparent);
+  backdrop-filter: blur(3px);
+}
+
+.if-confirm {
+  display: grid;
+  gap: 11px;
+  width: min(340px, 100%);
+  border: 1px solid var(--if-border-strong);
+  border-radius: 12px;
+  background: var(--if-panel);
+  box-shadow: 0 24px 60px -20px rgb(0 0 0 / 70%);
+  padding: 16px;
+}
+
+.if-confirm-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.if-confirm-ic {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--if-gold) 16%, transparent);
+  color: var(--if-gold);
+}
+
+.if-confirm-ic[data-danger] {
+  background: color-mix(in srgb, var(--if-danger) 16%, transparent);
+  color: var(--if-danger);
+}
+
+.if-confirm-ic svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.if-confirm-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.if-confirm-body {
+  margin: 0;
+  color: var(--if-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.if-confirm-body b {
+  color: var(--if-text);
+  font-weight: 600;
+}
+
+.if-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 1px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .if-confirm {
+    animation: if-confirm-in 140ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@keyframes if-confirm-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+
+.if-add-menu {
+  position: relative;
+}
+
+.if-create-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  border: 1px solid var(--if-border);
+  border-radius: 8px;
+  background: var(--if-panel-2);
+  color: var(--if-text);
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  padding: 5px 8px;
+}
+
+.if-create-toggle:hover,
+.if-create-toggle[aria-expanded='true'] {
+  border-color: var(--if-border-strong);
+}
+
+.if-add-caret {
+  color: var(--if-muted);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.if-add-menu-list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  right: 0;
+  display: grid;
+  min-width: 168px;
+  gap: 2px;
+  border: 1px solid var(--if-border-strong);
+  border-radius: 10px;
+  background: var(--if-panel);
+  box-shadow: 0 8px 18px rgb(0 0 0 / 28%);
+  padding: 5px;
+}
+
+.if-add-menu-action {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--if-text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  padding: 7px 9px;
+  text-align: left;
+}
+
+.if-add-menu-action:hover,
+.if-add-menu-action:focus-visible {
+  background: var(--if-panel-3);
+}
+
+.if-layer-list {
+  display: grid;
+  max-height: 220px;
+  gap: 3px;
+  overflow: auto;
+}
+
+.if-layers-empty {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  border: 1px dashed var(--if-border);
+  border-radius: 8px;
+  padding: 12px 10px;
+}
+
+.if-layers-empty-title {
+  color: var(--if-muted);
+  font-size: 12.5px;
+}
+
+.if-layer-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  padding: 4px 4px 4px 6px;
+}
+
+.if-layer-row:hover {
+  border-color: var(--if-border);
+  background: var(--if-panel-2);
+}
+
+.if-layer-row[data-active='true'] {
+  border-color: var(--if-primary);
+  background: color-mix(in srgb, var(--if-primary) 13%, transparent);
+}
+
+.if-layer-row-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--if-text);
+  outline: none;
+  padding: 5px 2px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.if-layer-row-name {
+  overflow: hidden;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.if-layer-row[data-hidden='true'] .if-layer-row-name {
+  color: var(--if-subtle);
+  text-decoration: line-through;
+}
+.if-layer-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.if-layer-action {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--if-muted);
+  font-size: 13px;
+  line-height: 1;
+  outline: none;
+  padding: 0;
+}
+
+.if-layer-action-icon {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.9;
+}
+
+.if-layer-action:hover {
+  border-color: var(--if-border);
+  background: var(--if-panel);
+  color: var(--if-text);
+}
+
+.if-layer-action[data-danger='true']:hover {
+  color: var(--if-danger);
+  border-color: color-mix(in srgb, var(--if-danger) 50%, var(--if-border));
+}
+
+.if-layer-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.if-adjust-tab {
+  display: grid;
+  gap: 12px;
+}
+
+.if-adjust-group {
+  display: grid;
+  gap: 8px;
+}
+
+/* "Center" sits in the position grid as a trailing cell, aligned to the inputs. */
+.if-center-btn {
+  align-self: end;
+  width: 100%;
+}
+
+.if-font-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+}
+
+.if-font-upload {
+  display: grid;
+  gap: 4px;
+  color: var(--if-muted);
+  font-size: 11px;
+}
+
+/* .if-export-tab is a .if-card now; only the stage-matching width is bespoke. */
+.if-preview-column .if-export-tab {
+  width: var(--if-stage-w);
+}
+
+.if-export-options {
+  display: grid;
+  gap: 10px;
+}
+
+/* SVG-source toggle on the left, the compact trim control filling the dead
+   space on its right so the two share one row. */
+.if-export-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+}
+
+.if-trim {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.if-trim-label {
+  color: var(--if-muted);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Beat the primitive's own width utilities (Slider's `w-full`, .if-input's
+   width:100%) with a two-class selector so these compact sizes win. */
+.if-trim .if-trim-range {
+  flex: 0 0 clamp(90px, 16vw, 150px);
+  width: clamp(90px, 16vw, 150px);
+}
+
+.if-input.if-trim-num {
+  width: 56px;
+  flex: 0 0 56px;
+  text-align: center;
+  padding-inline: 6px;
+}
+
+/* Ember thumb with a background-coloured ring, like the mockup range. */
+.if-inset-slider [role='slider'] {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--if-bg);
+  background: var(--if-primary);
+}
+
+.if-png-sizes {
+  display: grid;
+  gap: 6px;
+}
+
+.if-png-sizes-label {
+  color: var(--if-muted);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.if-png-sizes-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.if-png-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--if-border);
+  border-radius: 8px;
+  background: var(--if-panel-2);
+  color: var(--if-muted);
+  padding: 4px 10px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.if-png-size:hover {
+  border-color: color-mix(in srgb, var(--if-primary) 50%, var(--if-border));
+  color: var(--if-text);
+}
+
+.if-png-size[aria-pressed='true'] {
+  border-color: var(--if-primary);
+  background: color-mix(in srgb, var(--if-primary) 16%, var(--if-panel));
+  color: var(--if-text);
+}
+
+/* A check marks the selected state so it doesn't depend on colour alone. */
+.if-png-size[aria-pressed='true']::after {
+  content: '✓';
+  font-size: 10px;
+  line-height: 1;
+  color: var(--if-primary);
+}
+
+.if-png-size:focus-visible {
+  outline: 2px solid var(--if-focus);
+  outline-offset: 2px;
+}
+
+.if-export-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--if-border);
+  padding-top: 12px;
+}
+
+.if-export-count {
+  font-size: 13px;
+  color: var(--if-muted);
+}
+
+/*
+ * Toast surface (sonner). The <Toaster> lives inside .if-app, so it inherits the
+ * --if-* tokens; base colors come from CSS variables set inline on the Toaster
+ * element (see packages/ui sonner primitive), and these rules carry the rest of
+ * the old .if-notice treatment — compact padding, muted body copy, per-kind
+ * coral/gold tints, no type icon. Selectors are scoped under
+ * .if-app [data-sonner-toaster] so they out-specify sonner's own stylesheet,
+ * which it injects at runtime after this one loads.
+ */
+.if-app [data-sonner-toaster] [data-sonner-toast] {
+  padding: 10px 12px;
+}
+
+.if-app [data-sonner-toaster] [data-sonner-toast] [data-icon] {
+  display: none;
+}
+
+.if-app [data-sonner-toaster] [data-sonner-toast] [data-title] {
+  color: var(--if-text);
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.if-app [data-sonner-toaster] [data-sonner-toast] [data-description] {
+  color: var(--if-muted);
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.if-app [data-sonner-toaster] [data-sonner-toast][data-type='error'] {
+  border-color: color-mix(in srgb, var(--if-danger) 72%, var(--if-border));
+  background: color-mix(in srgb, var(--if-danger) 14%, var(--if-panel));
+}
+
+.if-app [data-sonner-toaster] [data-sonner-toast][data-type='success'] {
+  border-color: color-mix(in srgb, var(--if-primary) 72%, var(--if-border));
+  background: color-mix(in srgb, var(--if-primary) 12%, var(--if-panel));
+}
+
+.if-app [data-sonner-toaster] [data-sonner-toast] [data-close-button] {
+  background: var(--if-panel);
+  border-color: var(--if-border);
+  color: var(--if-muted);
+}
+
+.if-app [data-sonner-toaster] [data-sonner-toast] [data-close-button]:hover {
+  color: var(--if-text);
+  border-color: var(--if-muted);
+}
+
+.if-export-tab > div {
+  min-width: 0;
+}
+
+.if-file-input {
+  pointer-events: none;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.if-color-field {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+/* Span the full row only inside a multi-column field grid (Adjust). */
+.if-field-grid > .if-color-field {
+  grid-column: span 2;
+}
+
+.if-color-field[data-disabled='true'] {
+  opacity: 0.52;
+  pointer-events: none;
+}
+
+.if-color-control-row {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.if-color-swatch-anchor {
+  position: relative;
+  min-width: 0;
+}
+
+.if-color-swatch-button {
+  display: grid;
+  width: 100%;
+  height: 34px;
+  place-items: stretch;
+  overflow: hidden;
+  border: 1px solid var(--if-border);
+  border-radius: 8px;
+  background: var(--if-panel-2);
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.if-color-swatch-button:hover {
+  border-color: var(--if-border-strong);
+  background: var(--if-panel-3);
+}
+
+.if-color-swatch-button:focus-visible {
+  border-color: var(--if-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--if-primary) 28%, transparent);
+}
+
+/* The colour fills the swatch edge-to-edge (clipped by the button radius),
+   not inset inside a frame. */
+.if-color-swatch-chip {
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #000 30%, transparent);
+}
+
+.if-color-popover {
+  position: absolute;
+  z-index: 20;
+  top: 0;
+  left: 0;
+  width: min(252px, calc(100vw - 36px));
+  border: 1px solid var(--if-border-strong);
+  border-radius: 10px;
+  background: var(--if-panel);
+  box-shadow: 0 8px 18px rgb(0 0 0 / 28%);
+  padding: 8px;
+}
+
+.if-color-popover .react-colorful {
+  width: 100%;
+  height: 148px;
+}
+
+.if-color-popover .react-colorful__saturation {
+  border-radius: 8px 8px 0 0;
+}
+
+.if-color-popover .react-colorful__hue {
+  height: 18px;
+  border-radius: 0 0 8px 8px;
+}
+
+.if-color-popover .react-colorful__pointer {
+  width: 18px;
+  height: 18px;
+}
+
+.if-hex-input {
+  text-transform: uppercase;
+}
+
+.if-dock-note {
+  margin: 0;
+}
+
+.if-field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 9px;
+}
+
+.if-field {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  color: var(--if-muted);
+  font-size: 12px;
+}
+
+/* Label sits ABOVE the input (the redesign fix). Small, uppercase, tracked. */
+.if-field > span,
+.if-color-field > span {
+  color: var(--if-muted);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* "wide" only means span-2 inside a real field grid. As a standalone child of a
+   single-column group it would otherwise force a phantom second column. */
+.if-field-grid > .if-field-wide {
+  grid-column: span 2;
+}
+
+.if-field[data-disabled='true'] {
+  color: var(--if-subtle);
+}
+
+.if-input {
+  box-sizing: border-box;
+  height: 34px;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--if-border);
+  border-radius: 8px;
+  background: var(--if-input);
+  color: var(--if-text);
+  accent-color: var(--if-primary);
+  padding: 7px 9px;
+  font-size: 12.5px;
+  outline: none;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.if-input:hover:not(:disabled):not(:focus) {
+  border-color: var(--if-border-strong);
+}
+
+.if-input[type='number'] {
+  text-align: right;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Drop the native spinner everywhere; it renders unstyled and only on hover. */
+.if-input[type='number']::-webkit-outer-spin-button,
+.if-input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Number field: themed chevron steppers on the right edge and a drag-to-scrub label. */
+.if-num {
+  position: relative;
+  display: block;
+}
+
+.if-num-input {
+  padding-right: 24px;
+}
+
+.if-num-steppers {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  width: 21px;
+  border-left: 1px solid var(--if-border);
+  border-radius: 0 7px 7px 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 120ms ease;
+  pointer-events: none;
+}
+
+/* Reveal the steppers only when the field is in play, so the resting grid stays clean. */
+.if-num:hover .if-num-steppers,
+.if-num:focus-within .if-num-steppers {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.if-num-step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  background: var(--if-panel-3);
+  color: var(--if-muted);
+  cursor: pointer;
+  transition:
+    background-color 100ms ease,
+    color 100ms ease;
+}
+
+.if-num-step + .if-num-step {
+  border-top: 1px solid var(--if-border);
+}
+
+.if-num-step:hover {
+  background: var(--if-panel-2);
+  color: var(--if-text);
+}
+
+.if-num-step:active {
+  background: color-mix(in srgb, var(--if-primary) 30%, var(--if-panel-3));
+  color: var(--if-primary);
+}
+
+.if-num-step svg {
+  width: 9px;
+  height: 6px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The label is a scrub handle: ew cursor, no text selection while dragging. */
+.if-numfield > .if-num-label {
+  width: fit-content;
+  cursor: ew-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.if-numfield[data-disabled='true'] > .if-num-label {
+  cursor: default;
+}
+
+/* Lock the cursor and kill selection everywhere during an active scrub. */
+body.if-scrubbing,
+body.if-scrubbing * {
+  cursor: ew-resize !important;
+  user-select: none !important;
+}
+
+.if-input[type='color'] {
+  padding: 3px;
+}
+
+.if-input[type='range'] {
+  padding-inline: 0;
+}
+
+/* Placeholders need real contrast too, not the faint subtle gray. */
+.if-input::placeholder {
+  color: var(--if-muted);
+}
+
+.if-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+@media (max-width: 760px) {
+  .if-app {
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .if-header {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .if-editor-body {
+    grid-template-columns: 1fr;
+  }
+
+  .if-preview-column {
+    display: contents;
+  }
+
+  .if-preview-toolbar {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+    gap: 4px;
+    order: 1;
+  }
+
+  .if-toolbar-actions {
+    justify-items: start;
+  }
+
+  .if-preview {
+    order: 2;
+  }
+
+  .if-dock {
+    order: 3;
+    max-height: none;
+  }
+
+  .if-preview-column .if-export-tab {
+    order: 4;
+  }
+
+  .if-header-actions {
+    justify-content: start;
+  }
+
+  .if-create-toggle,
+  .if-layer-row-select {
+    min-height: 44px;
+  }
+
+  .if-layer-row {
+    grid-template-columns: 1fr;
+  }
+
+  .if-layer-row-actions {
+    justify-content: start;
+    gap: 6px;
+  }
+
+  .if-layer-action {
+    width: 44px;
+    height: 44px;
+  }
+
+  .if-canvas-frame {
+    width: min(100%, calc(100vw - 20px));
+    max-height: none;
+  }
+
+  .if-export-tab {
+    grid-template-columns: 1fr;
+  }
+
+  .if-field-wide {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 380px) {
+  .if-header-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .if-header-actions .if-button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,12 @@
+<svg viewBox="174.08 174.08 675.84 675.84" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    /* Light UI: no backdrop (dark anvil on the light tab). Dark UI: white rounded
+       backdrop so the dark anvil stays visible. */
+    #bg { display: none; }
+    @media (prefers-color-scheme: dark) { #bg { display: block; } }
+  </style>
+  <rect id="bg" x="11" y="6" width="680" height="680" rx="55" fill="#fff" transform="translate(161 166)" />
+  <path d="m3 11 6-2.8h11.4q.6 0 .6.6v1.6q0 .6-.6.6h-4.8q-.3 2-2.2 3.1h.6q.7 0 .6.7l-.3 2.2H16q.7 0 .7.7v.9q0 .6-.7.6H8q-.7 0-.7-.6v-.9q0-.7.7-.7h1.7l-.3-2.2q-.1-.7.6-.7h.6Q8.7 13 8.5 11v-.4Z" fill="#050609" transform="translate(173.872 -26.345) scale(35) rotate(12)" />
+  <path d="M17.8 2.6c0 1.4.6 2 2 2-1.4 0-2 .6-2 2 0-1.4-.6-2-2-2 1.4 0 2-.6 2-2" fill="#ff7a66" transform="translate(-12 161) scale(40)" />
+  <path d="M17.8 2.6c0 1.4.6 2 2 2-1.4 0-2 .6-2 2 0-1.4-.6-2-2-2 1.4 0 2-.6 2-2" fill="#fff" transform="translate(343.999 253) scale(20)" />
+</svg>
