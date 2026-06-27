@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": [
+      "ES2024",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "paths": {
+      "@toolbox/svg-core": [
+        "packages/svg-core/src/index.ts"
+      ],
+      "@toolbox/svg-render": [
+        "packages/svg-render/src/index.ts"
+      ],
+      "@toolbox/svg-ops": [
+        "packages/svg-ops/src/index.ts"
+      ],
+      "@toolbox/export-engine": [
+        "packages/export-engine/src/index.ts"
+      ],
+      "@toolbox/ui": [
+        "packages/ui/src/index.ts"
+      ]
+    },
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0"
+  }
+}

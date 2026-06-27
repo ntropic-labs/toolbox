@@ -1,0 +1,16 @@
+node_modules
+.pnpm-store
+dist
+coverage
+.turbo
+.env
+.env.*
+.DS_Store
+*.local
+.worktrees
+
+.github
+.claude
+
+.impeccable/critique
+.impeccable/live

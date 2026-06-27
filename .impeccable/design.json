@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-05T00:00:00.000Z",
+  "title": "Design System: Iconforge",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "Blackened Shell",
+        "canonical": "#050609",
+        "tonalRamp": [
+          "oklch(15% 0.01 255)",
+          "oklch(24% 0.01 255)",
+          "oklch(34% 0.01 255)",
+          "oklch(45% 0.01 255)",
+          "oklch(58% 0.01 255)",
+          "oklch(72% 0.01 255)",
+          "oklch(86% 0.01 255)",
+          "oklch(95% 0.01 255)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Charcoal Shelf",
+        "canonical": "#11151d",
+        "tonalRamp": [
+          "oklch(17% 0.015 255)",
+          "oklch(26% 0.015 255)",
+          "oklch(36% 0.015 255)",
+          "oklch(47% 0.015 255)",
+          "oklch(59% 0.015 255)",
+          "oklch(73% 0.015 255)",
+          "oklch(87% 0.015 255)",
+          "oklch(96% 0.015 255)"
+        ]
+      },
+      "primary": {
+        "role": "primary",
+        "displayName": "Ember Primary",
+        "canonical": "#ff7a66",
+        "tonalRamp": [
+          "oklch(20% 0.07 30)",
+          "oklch(30% 0.09 30)",
+          "oklch(42% 0.11 30)",
+          "oklch(54% 0.13 30)",
+          "oklch(66% 0.15 30)",
+          "oklch(76% 0.12 30)",
+          "oklch(86% 0.08 30)",
+          "oklch(95% 0.04 30)"
+        ]
+      },
+      "gold": {
+        "role": "secondary",
+        "displayName": "Brass Focus",
+        "canonical": "#e8b84a",
+        "tonalRamp": [
+          "oklch(19% 0.05 80)",
+          "oklch(30% 0.07 80)",
+          "oklch(42% 0.09 80)",
+          "oklch(55% 0.11 80)",
+          "oklch(68% 0.13 80)",
+          "oklch(78% 0.10 80)",
+          "oklch(88% 0.07 80)",
+          "oklch(96% 0.035 80)"
+        ]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Delete Red",
+        "canonical": "#d85d6a",
+        "tonalRamp": [
+          "oklch(18% 0.06 15)",
+          "oklch(29% 0.08 15)",
+          "oklch(41% 0.10 15)",
+          "oklch(53% 0.12 15)",
+          "oklch(65% 0.13 15)",
+          "oklch(76% 0.10 15)",
+          "oklch(87% 0.07 15)",
+          "oklch(95% 0.035 15)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "title": {
+        "displayName": "Wordmark Title",
+        "purpose": "App identity and strongest compact heading."
+      },
+      "body": {
+        "displayName": "Dense Mono Body",
+        "purpose": "Controls, helper text, buttons, and compact prose."
+      },
+      "label": {
+        "displayName": "Inline Label",
+        "purpose": "Field labels, layer status, and low-emphasis metadata."
+      }
+    },
+    "shadows": [
+      {
+        "name": "popover-lift",
+        "value": "0 8px 18px rgb(0 0 0 / 28%)",
+        "purpose": "Temporary overlays such as color pickers that sit above controls."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-fast",
+        "value": "120ms ease",
+        "purpose": "Default hover, border, color, and caret transitions."
+      },
+      {
+        "name": "state-toggle",
+        "value": "140ms ease",
+        "purpose": "Theme thumb translation and filled toggle movement."
+      }
+    ],
+    "breakpoints": [
+      { "name": "single-column", "value": "760px" },
+      { "name": "stack-controls", "value": "380px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Compact ember action for creation and export.",
+      "html": "<button class=\"ds-button-primary\">Download ZIP</button>",
+      "css": ".ds-button-primary { min-height: 32px; border: 1px solid #ff7a66; border-radius: 8px; padding: 6px 10px; background: #ff7a66; color: #170706; font: 700 13px/1.2 JetBrains Mono, ui-monospace, monospace; transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease; } .ds-button-primary:hover { border-color: #ff927f; background: #ff927f; } .ds-button-primary:focus-visible { outline: 2px solid #e8b84a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Raised graphite action for non-primary commands.",
+      "html": "<button class=\"ds-button-secondary\">Upload SVG</button>",
+      "css": ".ds-button-secondary { min-height: 32px; border: 1px solid #2a303b; border-radius: 8px; padding: 6px 10px; background: #171c25; color: #f4f0ec; font: 400 13px/1.2 JetBrains Mono, ui-monospace, monospace; transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease; } .ds-button-secondary:hover { border-color: #3a414e; background: #202631; } .ds-button-secondary:focus-visible { outline: 2px solid #e8b84a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Low-emphasis command that should not compete with primary export or create actions.",
+      "html": "<button class=\"ds-button-ghost\">Undo</button>",
+      "css": ".ds-button-ghost { min-height: 32px; border: 1px solid transparent; border-radius: 8px; padding: 6px 10px; background: transparent; color: #aaa39c; font: 400 13px/1.2 JetBrains Mono, ui-monospace, monospace; transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease; } .ds-button-ghost:hover { background: #171c25; color: #f4f0ec; } .ds-button-ghost:focus-visible { outline: 2px solid #e8b84a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Transparent destructive action that stays visually subordinate until needed.",
+      "html": "<button class=\"ds-button-danger\">Delete layer</button>",
+      "css": ".ds-button-danger { min-height: 32px; border: 1px solid #d85d6a; border-radius: 8px; padding: 6px 10px; background: transparent; color: #d85d6a; font: 400 13px/1.2 JetBrains Mono, ui-monospace, monospace; transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease; } .ds-button-danger:hover { border-color: #e87580; background: rgb(216 93 106 / 14%); color: #e87580; } .ds-button-danger:focus-visible { outline: 2px solid #e8b84a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Deep input well with embedded leading label for dense controls.",
+      "html": "<label class=\"ds-field\"><span>Scale</span><input class=\"ds-input\" value=\"100\" /></label>",
+      "css": ".ds-field { position: relative; display: grid; min-width: 0; color: #aaa39c; font: 400 12px/1 JetBrains Mono, ui-monospace, monospace; } .ds-field > span { pointer-events: none; position: absolute; z-index: 1; left: 9px; top: 50%; max-width: 64px; overflow: hidden; color: #aaa39c; text-overflow: ellipsis; transform: translateY(-50%); white-space: nowrap; } .ds-input { box-sizing: border-box; height: 42px; width: 100%; border: 1px solid #2a303b; border-radius: 8px; background: #0c1118; color: #f4f0ec; padding: 7px 8px 7px 76px; font: 400 13px/1.2 JetBrains Mono, ui-monospace, monospace; outline: none; } .ds-input:focus-visible { outline: 2px solid #e8b84a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Repository Link",
+      "kind": "nav",
+      "refersTo": "repo-link",
+      "description": "Button-style external link that carries open-source credibility without marketing chrome.",
+      "html": "<a class=\"ds-repo-link\" href=\"#\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.86 8.37 6.84 9.73.5.09.68-.22.68-.49l-.01-1.9c-2.78.62-3.37-1.22-3.37-1.22-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.56 2.35 1.11 2.92.85.09-.67.35-1.11.63-1.37-2.22-.26-4.55-1.14-4.55-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05A9.3 9.3 0 0 1 12 6.98c.85 0 1.7.12 2.5.35 1.9-1.33 2.74-1.05 2.74-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.79-4.57 5.05.36.32.68.95.68 1.92l-.01 2.78c0 .27.18.59.69.49A10.15 10.15 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z\" /></svg><span>GitHub</span></a>",
+      "css": ".ds-repo-link { display: inline-flex; min-height: 38px; align-items: center; gap: 7px; border: 1px solid #2a303b; border-radius: 9px; color: #aaa39c; font: 400 13px/1.2 JetBrains Mono, ui-monospace, monospace; padding: 8px 12px; text-decoration: none; transition: border-color 120ms ease, color 120ms ease; } .ds-repo-link svg { width: 16px; height: 16px; flex: 0 0 auto; fill: currentColor; } .ds-repo-link:hover { border-color: #3a414e; color: #f4f0ec; } .ds-repo-link:focus-visible { outline: 2px solid #e8b84a; outline-offset: 2px; }"
+    },
+    {
+      "name": "Dock Panel",
+      "kind": "card",
+      "refersTo": "dock-panel",
+      "description": "Right-side control container with flat depth and compact divisions.",
+      "html": "<section class=\"ds-dock\"><div class=\"ds-dock-summary\">Document</div><div class=\"ds-dock-body\">Editor controls</div></section>",
+      "css": ".ds-dock { width: 320px; border: 1px solid #2a303b; border-radius: 10px; background: #11151d; color: #f4f0ec; font: 400 13px/1.45 JetBrains Mono, ui-monospace, monospace; overflow: hidden; } .ds-dock-summary { border-bottom: 1px solid #2a303b; padding: 10px 12px; font-weight: 700; } .ds-dock-body { padding: 12px; color: #aaa39c; }"
+    },
+    {
+      "name": "Layer Row",
+      "kind": "custom",
+      "refersTo": "layer-row-active",
+      "description": "Selectable layer list row with ember active state and compact action affordance.",
+      "html": "<div class=\"ds-layer-row\" data-active=\"true\"><button class=\"ds-layer-select\"><strong>Foreground SVG</strong><span>Visible · unlocked</span></button><button class=\"ds-layer-action\" aria-label=\"Hide layer\">⌁</button></div>",
+      "css": ".ds-layer-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px; border: 1px solid transparent; border-radius: 7px; background: transparent; padding: 4px; font-family: JetBrains Mono, ui-monospace, monospace; } .ds-layer-row[data-active=\"true\"] { border-color: #ff7a66; background: rgb(255 122 102 / 13%); } .ds-layer-select { display: grid; min-width: 0; gap: 2px; border: 0; background: transparent; color: #f4f0ec; padding: 4px; text-align: left; } .ds-layer-select strong { overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; } .ds-layer-select span { overflow: hidden; color: #aaa39c; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; } .ds-layer-action { width: 28px; height: 28px; border: 1px solid #2a303b; border-radius: 6px; background: #11151d; color: #aaa39c; } .ds-layer-action:hover { border-color: #3a414e; color: #f4f0ec; }"
+    },
+    {
+      "name": "Export Strip",
+      "kind": "card",
+      "refersTo": "export-strip",
+      "description": "Compact preview-column export surface with direct output copy and primary action.",
+      "html": "<div class=\"ds-export-strip\"><div><p>iOS and Android icon set</p><span>Exports PNGs, manifests, and XML resources.</span></div><button>Download ZIP</button></div>",
+      "css": ".ds-export-strip { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; width: 640px; max-width: 100%; border: 1px solid #2a303b; border-radius: 10px; background: #11151d; padding: 10px; font-family: JetBrains Mono, ui-monospace, monospace; } .ds-export-strip p { margin: 0 0 3px; color: #f4f0ec; font-size: 15px; font-weight: 700; letter-spacing: -0.02em; } .ds-export-strip span { color: #aaa39c; font-size: 13px; line-height: 1.45; } .ds-export-strip button { min-height: 32px; border: 1px solid #ff7a66; border-radius: 8px; background: #ff7a66; color: #170706; padding: 6px 10px; font: 700 13px/1.2 JetBrains Mono, ui-monospace, monospace; } .ds-export-strip button:hover { background: #ff927f; border-color: #ff927f; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Maintainer’s Workbench",
+    "overview": "Iconforge uses a compact dark workshop surface: near-black page chrome, graphite panels, thin steel borders, ember primary actions, and a brass focus accent. The system should feel like a trusted open-source tool you can keep beside a code editor while preparing release assets.\n\nThe visual language is intentionally flat, bordered, and tactile. Depth comes from tonal panel steps, exact strokes, hover responses, and strong focus rings, not decorative shadows or brand theater. Controls are dense because the job is precise, but labels stay readable and the preview remains the visual anchor.\n\nIt explicitly rejects toy generator feel, heavy design-suite complexity, and SaaS marketing gloss. If a treatment does not help users compose, inspect, or export icons, it does not belong in this interface.",
+    "keyCharacteristics": [
+      "Dense, mono-forward product UI with one type family.",
+      "Dark charcoal shell with ember and brass accents used sparingly.",
+      "Flat panels, thin borders, and short state transitions.",
+      "Editor-first layout: preview large, controls compact, export always legible."
+    ],
+    "rules": [
+      {
+        "name": "The Ember Is a Verb Rule",
+        "body": "The primary accent is reserved for actions, selection, and state. Never use it as filler decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Border Carries Depth Rule",
+        "body": "Panels and controls separate with one-pixel strokes and tonal changes. Shadows are reserved for temporary overlays.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Mono Rule",
+        "body": "Do not introduce a second display or body family into the product UI. Density and trust come from one well-controlled type system.",
+        "section": "typography"
+      },
+      {
+        "name": "The Resting Surface Rule",
+        "body": "Resting panels never float. If a surface is not overlapping another control, it uses tonal layering and borders, not shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the preview large and centered; controls should support the asset, not visually outrank it.",
+      "Do use `primary` only for action, selection, and state as required by The Ember Is a Verb Rule.",
+      "Do keep labels sentence case and direct: “Download ZIP”, “Add font URL”, “Unlock to delete”.",
+      "Do preserve visible keyboard focus with the brass 2px outline.",
+      "Do use one-pixel borders and tonal panel steps before introducing a shadow."
+    ],
+    "donts": [
+      "Don't create toy generator feel with oversized playful controls, novelty graphics, weak density, or output that looks unreliable.",
+      "Don't introduce heavy design-suite complexity with excessive chrome, buried panels, or terminology beyond the current icon-export job.",
+      "Don't use SaaS marketing gloss, hero metrics, decorative badges, gradient text, or buzzword-driven copy.",
+      "Don't add side-stripe borders, gradient text, glass cards, or repeated card grids.",
+      "Don't add decorative motion. Product motion must convey state and must include reduced-motion behavior."
+    ]
+  }
+}
