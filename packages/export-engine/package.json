@@ -1,0 +1,21 @@
+{
+  "name": "@toolbox/export-engine",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "license": "BSD-3-Clause",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@toolbox/svg-core": "workspace:*",
+    "@toolbox/svg-render": "workspace:*",
+    "jszip": "^3.10.1"
+  }
+}
