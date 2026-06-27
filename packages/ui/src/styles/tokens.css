@@ -1,0 +1,62 @@
+/*
+ * shadcn/ui token bridge.
+ *
+ * shadcn primitives are written against semantic variables (--background,
+ * --primary, --ring, …). Rather than introduce a second palette, we map those
+ * names onto IconForge's existing --if-* identity tokens, scoped to .if-app so
+ * the dark/light switch (.if-app[data-theme='light']) flows through for free.
+ * The @theme inline block registers the semantic vars as Tailwind v4 color and
+ * radius tokens so utilities like bg-primary / border-border / ring-ring /
+ * rounded-lg resolve to the identity look. Adding a primitive therefore inherits
+ * coral/gold/JetBrains automatically — no per-component theming.
+ */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+.if-app {
+  --background: var(--if-bg);
+  --foreground: var(--if-text);
+  --card: var(--if-panel);
+  --card-foreground: var(--if-text);
+  --popover: var(--if-panel);
+  --popover-foreground: var(--if-text);
+  --primary: var(--if-primary);
+  --primary-foreground: var(--if-primary-text);
+  --secondary: var(--if-panel-2);
+  --secondary-foreground: var(--if-text);
+  --muted: var(--if-panel-2);
+  --muted-foreground: var(--if-muted);
+  --accent: var(--if-panel-3);
+  --accent-foreground: var(--if-text);
+  --destructive: var(--if-danger);
+  --destructive-foreground: var(--if-primary-text);
+  --border: var(--if-border);
+  --input: var(--if-input);
+  --ring: var(--if-focus); /* gold focus ring preserved */
+  --radius: 0.5rem; /* matches the 8px rounding in styles.css */
+}
