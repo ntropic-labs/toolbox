@@ -1,0 +1,24 @@
+{
+  "name": "@toolbox/svg-ops",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "license": "BSD-3-Clause",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@toolbox/svg-core": "workspace:*",
+    "fontkit": "^2.0.4",
+    "svgo": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/fontkit": "^2.0.8"
+  }
+}
