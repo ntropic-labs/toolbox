@@ -9,7 +9,8 @@ coverage
 *.local
 .worktrees
 
-.github
+.github/*
+!.github/workflows
 .claude
 
 .impeccable/critique

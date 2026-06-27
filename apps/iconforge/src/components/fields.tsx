@@ -184,7 +184,8 @@ function startScrub(event: ReactPointerEvent, input: HTMLInputElement | null) {
 const nativeInputValueSetter =
   typeof HTMLInputElement === 'undefined'
     ? undefined
-    : Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+    : // eslint-disable-next-line @typescript-eslint/unbound-method -- always invoked via .call in setReactInputValue
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
 
 function setReactInputValue(input: HTMLInputElement, value: string) {
   if (nativeInputValueSetter) {
