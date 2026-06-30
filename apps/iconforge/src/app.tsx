@@ -39,7 +39,7 @@ import {
 } from './storage';
 import {
   addLayer,
-  centerFromMatrix,
+  centerInUserSpace,
   centerLayer,
   duplicateLayer,
   fitTransform,
@@ -47,6 +47,7 @@ import {
   getSelectedNode,
   layerCenter,
   listLayers,
+  normalizeCanvas,
   removeLayer,
   reorderLayer,
   setAdaptiveRole,
@@ -363,8 +364,6 @@ export function App() {
   useEffect(() => {
     const node = getSelectedNode(scene, selectedId);
     const family = node?.tag.toLowerCase() === 'text' ? node.attributes['font-family'] : undefined;
-    // Re-seed the font control from the newly selected layer; this is a deliberate
-    // selection→state sync, so the set-state-in-effect guidance does not apply.
     /* eslint-disable react-hooks/set-state-in-effect */
     setFontInput(family ?? '');
     setFontStatus(
@@ -430,6 +429,10 @@ export function App() {
     if (bbox) commit(centerLayer(scene, selectedId, bbox));
   }
 
+  function fitCanvas() {
+    commit(normalizeCanvas(scene));
+  }
+
   function setCenter(axis: 'x' | 'y', value: number) {
     if (!selectedId || !selectedBox) return;
     commit(setLayerCenter(scene, selectedId, selectedBox, axis, value));
@@ -470,6 +473,15 @@ export function App() {
       showNotice(getSvgUploadFailedNotice());
     }
   }
+
+  const [vbX, vbY, vbW, vbH] = scene.root.viewBox;
+  const canvasNormalized =
+    vbX === 0 &&
+    vbY === 0 &&
+    vbW === vbH &&
+    vbW > 0 &&
+    scene.root.width === undefined &&
+    scene.root.height === undefined;
 
   const layers = listLayers(scene, selectedId);
   const selectedLabel = selectedNode
@@ -564,6 +576,8 @@ export function App() {
               projectName={projectName}
               onRenameProject={renameProject}
               onDownloadProject={downloadProject}
+              onFitCanvas={fitCanvas}
+              canvasNormalized={canvasNormalized}
               openControl={
                 <ProjectMenu
                   projects={projects}
@@ -664,8 +678,10 @@ function renderedCenter(
   element: SVGGraphicsElement,
   bbox: LayerBox
 ): { x: number; y: number } | null {
-  const ctm = element.getCTM?.();
-  return ctm ? centerFromMatrix(ctm, bbox) : null;
+  const elementCtm = element.getScreenCTM?.();
+  const svgCtm = element.ownerSVGElement?.getScreenCTM?.();
+  if (!elementCtm || !svgCtm) return null;
+  return centerInUserSpace(svgCtm, elementCtm, bbox);
 }
 
 function fallbackCenter(scene: SvgScene, id: string, bbox: LayerBox): { x: number; y: number } {

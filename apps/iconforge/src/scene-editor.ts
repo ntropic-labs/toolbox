@@ -7,6 +7,7 @@ import {
   setAttributes,
   setText,
   type SvgNode,
+  type SvgRoot,
   type SvgScene
 } from '@toolbox/svg-core';
 import {
@@ -195,6 +196,41 @@ export function centerFromMatrix(
   };
 }
 
+function invertMatrix(m: AffineMatrix): AffineMatrix | null {
+  const det = m.a * m.d - m.b * m.c;
+  if (det === 0 || !Number.isFinite(det)) return null;
+  const inv = 1 / det;
+  return {
+    a: m.d * inv,
+    b: -m.b * inv,
+    c: -m.c * inv,
+    d: m.a * inv,
+    e: (m.c * m.f - m.d * m.e) * inv,
+    f: (m.b * m.e - m.a * m.f) * inv
+  };
+}
+
+function multiplyMatrix(m: AffineMatrix, n: AffineMatrix): AffineMatrix {
+  return {
+    a: m.a * n.a + m.c * n.b,
+    b: m.b * n.a + m.d * n.b,
+    c: m.a * n.c + m.c * n.d,
+    d: m.b * n.c + m.d * n.d,
+    e: m.a * n.e + m.c * n.f + m.e,
+    f: m.b * n.e + m.d * n.f + m.f
+  };
+}
+
+export function centerInUserSpace(
+  svgCtm: AffineMatrix,
+  elementCtm: AffineMatrix,
+  bbox: LayerBox
+): { readonly x: number; readonly y: number } | null {
+  const svgInverse = invertMatrix(svgCtm);
+  if (!svgInverse) return null;
+  return centerFromMatrix(multiplyMatrix(svgInverse, elementCtm), bbox);
+}
+
 export function setLayerCenter(
   scene: SvgScene,
   id: string,
@@ -274,6 +310,27 @@ export function fitTransform(
   if (upW <= 0 || upH <= 0) return '';
   const scale = Math.min(hostW / upW, hostH / upH);
   return composeTransform({ tx: hostX - scale * upX, ty: hostY - scale * upY, scale, rotate: 0 });
+}
+
+export function normalizeCanvas(scene: SvgScene, size = 1024): SvgScene {
+  const [vx, vy, vw, vh] = scene.root.viewBox;
+  if (vw <= 0 || vh <= 0) return scene;
+  const s = Math.min(size / vw, size / vh);
+  const tfx = (size - s * vw) / 2 - s * vx;
+  const tfy = (size - s * vh) / 2 - s * vy;
+  
+  const refit = scene.root.children.reduce((acc, node) => {
+    const { tx, ty, scale, rotate } = parseTransform(node.attributes.transform);
+    const transform = composeTransform({ tx: tfx + s * tx, ty: tfy + s * ty, scale: s * scale, rotate });
+    return setAttributes(acc, node.id, { transform: transform.length === 0 ? null : transform });
+  }, scene);
+
+  const root: SvgRoot = {
+    viewBox: [0, 0, size, size],
+    attributes: refit.root.attributes,
+    children: refit.root.children
+  };
+  return { root };
 }
 
 export function setNodeText(scene: SvgScene, id: string, text: string): SvgScene {

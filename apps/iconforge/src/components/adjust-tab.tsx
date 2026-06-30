@@ -23,6 +23,8 @@ export function DocumentControls({
   projectName,
   onRenameProject,
   onDownloadProject,
+  onFitCanvas,
+  canvasNormalized = false,
   openControl
 }: {
   readonly backgroundColor: string;
@@ -32,6 +34,8 @@ export function DocumentControls({
   readonly projectName: string;
   readonly onRenameProject: (name: string) => void;
   readonly onDownloadProject: () => void;
+  readonly onFitCanvas?: () => void;
+  readonly canvasNormalized?: boolean;
   readonly openControl: ReactNode;
 }) {
   const backgroundMode = backgroundColor === 'transparent' ? 'transparent' : 'color';
@@ -60,6 +64,27 @@ export function DocumentControls({
       <p className="m-0 text-[11px] leading-[1.45] text-muted-foreground [&_b]:font-semibold [&_b]:text-foreground">
         Projects are kept in this browser. <b>Download</b> saves a copy as a <b>.json</b> file.
       </p>
+      {onFitCanvas ? (
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            type="button"
+            className="flex-1"
+            onClick={onFitCanvas}
+            disabled={canvasNormalized}
+            title="Resize the canvas to a clean 1024×1024 square and fit the artwork into it, centered."
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 9V4h5" />
+              <path d="M20 9V4h-5" />
+              <path d="M4 15v5h5" />
+              <path d="M20 15v5h-5" />
+            </svg>
+            Fit to canvas
+          </Button>
+          <InfoDot label="Normalizes an unusual or non-square canvas (for example a pasted logo) to a centered 1024×1024 square. Undoable." />
+        </div>
+      ) : null}
       <div className="relative grid min-w-0 gap-[5px] text-[12px] text-muted-foreground">
         <span className="text-[9.5px] font-medium uppercase leading-none tracking-[0.12em] text-muted-foreground">
           Background

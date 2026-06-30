@@ -4,6 +4,7 @@ import { scene } from './test-support';
 import {
   addLayer,
   centerFromMatrix,
+  centerInUserSpace,
   centerLayer,
   duplicateLayer,
   fitTransform,
@@ -13,6 +14,7 @@ import {
   getSelectedNode,
   layerCenter,
   listLayers,
+  normalizeCanvas,
   removeLayer,
   reorderLayer,
   setAdaptiveRole,
@@ -398,6 +400,40 @@ describe('centerFromMatrix', () => {
   });
 });
 
+describe('centerInUserSpace', () => {
+  const bbox = { x: 100, y: 100, width: 200, height: 200 };
+
+  it('recovers the user-space centre regardless of the viewBox->viewport scale', () => {
+    const userTransform = { a: 0.7, b: 0, c: 0, d: 0.7, e: 50, f: -30 };
+    const expected = centerFromMatrix(userTransform, bbox);
+
+    const svgCtm = { a: 0.25, b: 0, c: 0, d: 0.25, e: 1, f: -200 };
+    const elementCtm = {
+      a: 0.25 * 0.7,
+      b: 0,
+      c: 0,
+      d: 0.25 * 0.7,
+      e: 0.25 * 50 + 1,
+      f: 0.25 * -30 - 200
+    };
+
+    const recovered = centerInUserSpace(svgCtm, elementCtm, bbox);
+    expect(recovered).not.toBeNull();
+    expect(recovered!.x).toBeCloseTo(expected.x, 6);
+    expect(recovered!.y).toBeCloseTo(expected.y, 6);
+
+    expect(centerFromMatrix(elementCtm, bbox).x).not.toBeCloseTo(expected.x, 6);
+  });
+
+  it('is the identity when the root svg renders 1:1 (the default-project case)', () => {
+    const identity = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+    const elementCtm = { a: 1, b: 0, c: 0, d: 1, e: 200, f: 200 };
+    expect(centerInUserSpace(identity, elementCtm, bbox)).toEqual(
+      centerFromMatrix(elementCtm, bbox)
+    );
+  });
+});
+
 describe('scene-editor background', () => {
   it('reports transparent when there is no full-bleed back rect', () => {
     const s = scene('<svg viewBox="0 0 24 24"><rect x="4" y="4" width="8" height="8" /></svg>');
@@ -479,5 +515,51 @@ describe('scene-editor background', () => {
     expect(back.attributes.fill).toBe('#123456');
     expect(back.attributes.width).toBe('24');
     expect(getBackgroundColor(withBg)).toBe('#123456');
+  });
+});
+
+describe('normalizeCanvas', () => {
+  const bbox = { x: 0, y: 0, width: 10, height: 10 };
+
+  it('rewrites an off-origin, non-square viewBox to a centred square and remaps layers', () => {
+    const s = scene(
+      '<svg width="400" height="208" viewBox="-100 -200 2000 1000"><g transform="translate(300 100) scale(2)"><rect width="10" height="10" /></g></svg>'
+    );
+
+    const fitted = normalizeCanvas(s, 1000);
+
+    expect(fitted.root.viewBox).toEqual([0, 0, 1000, 1000]);
+    expect(fitted.root.width).toBeUndefined();
+    expect(fitted.root.height).toBeUndefined();
+
+    const before = layerCenter(s.root.children[0]!, bbox);
+    const after = layerCenter(fitted.root.children[0]!, bbox);
+    expect(after.x).toBeCloseTo(0.5 * before.x + 50, 6);
+    expect(after.y).toBeCloseTo(0.5 * before.y + 350, 6);
+    expect(after).toEqual({ x: 205, y: 405 });
+  });
+
+  it('preserves a layer rotation while refitting', () => {
+    const s = scene(
+      '<svg viewBox="-100 -200 2000 1000"><g transform="translate(300 100) scale(2) rotate(90)"><rect width="10" height="10" /></g></svg>'
+    );
+
+    const fitted = normalizeCanvas(s, 1000);
+
+    expect(serializeSvg(fitted)).toContain('rotate(90)');
+    const after = layerCenter(fitted.root.children[0]!, bbox);
+    expect(after.x).toBeCloseTo(195, 6);
+    expect(after.y).toBeCloseTo(405, 6);
+  });
+
+  it('is a no-op for a canvas that is already the target square', () => {
+    const s = scene(
+      '<svg viewBox="0 0 1024 1024"><g transform="translate(100 50)"><rect width="10" height="10" /></g></svg>'
+    );
+
+    const fitted = normalizeCanvas(s);
+
+    expect(fitted.root.viewBox).toEqual([0, 0, 1024, 1024]);
+    expect(serializeSvg(fitted)).toContain('translate(100 50)');
   });
 });
