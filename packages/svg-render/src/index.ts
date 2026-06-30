@@ -1,7 +1,8 @@
-import { serializeSvg, type SvgContent, type SvgNode, type SvgScene } from '@toolbox/svg-core';
+import { nodeText, serializeSvg, type SvgContent, type SvgNode, type SvgScene } from '@toolbox/svg-core';
 
 export interface RenderMarkupOptions {
   readonly nodeIds?: boolean;
+  readonly keepStyle?: boolean;
 }
 
 export interface SceneRenderOptions {
@@ -12,11 +13,14 @@ export interface SceneRenderOptions {
 
 export function renderToMarkup(scene: SvgScene, options: RenderMarkupOptions = {}): string {
   const nodeIds = options.nodeIds ?? true;
+  const keepStyle = options.keepStyle ?? false;
   return serializeSvg({
     root: {
       ...scene.root,
       attributes: stripExternalResourceAttributes(scene.root.attributes),
-      children: scene.root.children.map((node) => toRenderNode(node, nodeIds)).filter(isSvgNode)
+      children: scene.root.children
+        .map((node) => toRenderNode(node, nodeIds, keepStyle))
+        .filter(isSvgNode)
     }
   });
 }
@@ -41,7 +45,7 @@ export function renderSceneToSvgText(
     }
   };
 
-  const markup = renderToMarkup(renderScene, { nodeIds: false });
+  const markup = renderToMarkup(renderScene, { nodeIds: false, keepStyle: true });
   if (!options.fontFaceCss) return markup;
   return markup.replace(/^(<svg[^>]*>)/u, `$1<style>${options.fontFaceCss}</style>`);
 }
@@ -95,14 +99,21 @@ function svgToImage(svgText: string): Promise<HTMLImageElement> {
   });
 }
 
-function toRenderNode(node: SvgNode, nodeIds: boolean): SvgNode | null {
+function toRenderNode(node: SvgNode, nodeIds: boolean, keepStyle: boolean): SvgNode | null {
+  if (node.tag.toLowerCase() === 'style') {
+    return keepStyle ? toSanitizedStyleNode(node, nodeIds) : null;
+  }
   if (isUnsafePreviewElement(node.tag)) {
     return null;
   }
 
-  const children = node.children.map((child) => toRenderNode(child, nodeIds)).filter(isSvgNode);
+  const children = node.children
+    .map((child) => toRenderNode(child, nodeIds, keepStyle))
+    .filter(isSvgNode);
   const content = node.content
-    ?.map((item): SvgContent | null => ('type' in item ? item : toRenderNode(item, nodeIds)))
+    ?.map((item): SvgContent | null =>
+      'type' in item ? item : toRenderNode(item, nodeIds, keepStyle)
+    )
     .filter(isSvgContent);
 
   return {
@@ -114,6 +125,29 @@ function toRenderNode(node: SvgNode, nodeIds: boolean): SvgNode | null {
     children,
     ...(content === undefined ? {} : { content })
   };
+}
+
+function toSanitizedStyleNode(node: SvgNode, nodeIds: boolean): SvgNode {
+  const css = sanitizeStyleCss(nodeText(node));
+  return {
+    ...node,
+    attributes: {
+      ...stripExternalResourceAttributes(node.attributes),
+      ...(nodeIds ? { 'data-fid': node.id } : {})
+    },
+    children: [],
+    content: css.length > 0 ? [{ type: 'text', value: css }] : [],
+    text: css
+  };
+}
+
+function sanitizeStyleCss(css: string): string {
+  const withoutImports = css.replace(/@import[^;]*;?/giu, '');
+  return withoutImports.replace(
+    /url\(\s*(['"]?)([^'")]*)\1\s*\)/giu,
+    (full, _quote: string, reference: string) =>
+      isFetchableResourceReference(reference) ? 'none' : full
+  );
 }
 
 function isSvgNode(node: SvgNode | null): node is SvgNode {
@@ -144,7 +178,6 @@ function isUnsafePreviewElement(tag: string): boolean {
     case 'object':
     case 'embed':
     case 'script':
-    case 'style':
     case 'link':
     case 'meta':
       return true;

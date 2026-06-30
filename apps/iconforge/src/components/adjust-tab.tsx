@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { HexColorInput, HexColorPicker } from 'react-colorful';
 import type { SvgNode } from '@toolbox/svg-core';
-import { Button, Popover, PopoverContent, PopoverTrigger } from '@toolbox/ui';
+import { Alert, Button, Popover, PopoverContent, PopoverTrigger } from '@toolbox/ui';
 import { getAdaptiveRole, getNodeFields, type AdaptiveRole } from '../scene-editor';
 import type { TextShadow } from '../text-effects';
 import {
@@ -92,6 +92,7 @@ export type FontStatus =
 
 export function AdjustTab({
   node,
+  stylingMayOverride,
   center,
   onSetCenter,
   rotation,
@@ -113,6 +114,7 @@ export function AdjustTab({
   onSetShadow
 }: {
   readonly node: SvgNode | null;
+  readonly stylingMayOverride?: boolean;
   readonly center?: { readonly x: number; readonly y: number } | null;
   readonly onSetCenter?: (axis: 'x' | 'y', value: number) => void;
   readonly rotation?: number;
@@ -245,6 +247,13 @@ export function AdjustTab({
     <div className="if-adjust-tab">
       {nameField ? renderField(nameField) : null}
       {contentField ? renderField(contentField) : null}
+
+      {stylingMayOverride ? (
+        <Alert variant="warning" title="Styled by embedded CSS">
+          This layer is colored by a <code>{'<style>'}</code> block, so the Fill control below has
+          no visible effect. Edit the CSS in the <strong>Code</strong> tab.
+        </Alert>
+      ) : null}
 
       {showFontControls ? (
         <div className="if-adjust-group">

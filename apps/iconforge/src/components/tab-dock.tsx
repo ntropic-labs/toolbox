@@ -111,6 +111,14 @@ export function TabDock({
                   aria-selected={layer.selected}
                 >
                   <span className="if-layer-row-name">{layer.label}</span>
+                  {layer.hasCss ? (
+                    <span
+                      className="if-pill if-pill-ember if-pill-tiny"
+                      title="Colors come from embedded CSS — edit them in the Code tab"
+                    >
+                      CSS
+                    </span>
+                  ) : null}
                   {layer.adaptiveRole === 'background' ? (
                     <span className="if-pill if-pill-muted if-pill-tiny">BG</span>
                   ) : null}

@@ -579,6 +579,7 @@ export function App() {
           adjustControls={
             <AdjustTab
               node={selectedNode}
+              stylingMayOverride={layers.find((layer) => layer.selected)?.hasCss ?? false}
               center={selectedCenter}
               onSetCenter={setCenter}
               rotation={selectedRotation}

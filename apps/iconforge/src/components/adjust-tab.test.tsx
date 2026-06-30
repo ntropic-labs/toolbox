@@ -198,3 +198,16 @@ describe('AdjustTab text controls', () => {
     expect(html).not.toContain('Convert to shapes');
   });
 });
+
+describe('AdjustTab CSS override warning', () => {
+  it('shows the embedded-CSS warning only when the layer is CSS-styled', () => {
+    const node = firstNode('<svg viewBox="0 0 24 24"><rect fill="red" width="4" height="4" /></svg>');
+
+    expect(renderToStaticMarkup(<AdjustTab node={node} {...textProps} stylingMayOverride />)).toContain(
+      'embedded CSS'
+    );
+    expect(renderToStaticMarkup(<AdjustTab node={node} {...textProps} />)).not.toContain(
+      'embedded CSS'
+    );
+  });
+});

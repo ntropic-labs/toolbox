@@ -142,7 +142,7 @@ describe('SVG render raster text contract', () => {
     const svgText = renderSceneToSvgText(parsed.scene!);
 
     expect(svgText).not.toContain('https://example.com');
-    expect(svgText).not.toContain('<style');
+    expect(svgText).not.toContain('@import');
     expect(svgText).not.toContain('<foreignObject');
     expect(svgText).not.toContain('filter=');
   });
@@ -292,5 +292,30 @@ describe('renderSceneToSvgText font embedding', () => {
     expect(withFont).toContain(css);
 
     expect(renderSceneToSvgText(scene, { size: 64 })).not.toContain('<style>');
+  });
+});
+
+describe('faithful <style> rendering for raster output', () => {
+  it('keeps a <style> block so embedded CSS still applies when rasterized', () => {
+    const scene = parseSvg(
+      '<svg viewBox="0 0 10 10"><g fill="#e4a82c"><style>.s0{fill:#404447}</style><path class="s0" d="M0 0h1v1z" /></g></svg>'
+    ).scene!;
+
+    const svgText = renderSceneToSvgText(scene);
+
+    expect(svgText).toContain('<style>');
+    expect(svgText).toContain('.s0{fill:#404447}');
+  });
+
+  it('strips @import and external url() from kept <style> CSS but keeps internal refs', () => {
+    const scene = parseSvg(
+      '<svg viewBox="0 0 10 10"><style>@import url(https://evil.test/x.css);.a{fill:url(http://evil.test/i.png)}.b{fill:url(#grad)}</style><rect width="10" height="10" /></svg>'
+    ).scene!;
+
+    const svgText = renderSceneToSvgText(scene);
+
+    expect(svgText).not.toContain('@import');
+    expect(svgText).not.toContain('evil.test');
+    expect(svgText).toContain('url(#grad)');
   });
 });

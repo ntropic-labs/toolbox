@@ -1,3 +1,4 @@
+export { Alert, alertVariants, type AlertProps } from './primitives/alert';
 export { Button, buttonVariants, type ButtonProps } from './primitives/button';
 export { Popover, PopoverTrigger, PopoverContent } from './primitives/popover';
 export {

@@ -15,6 +15,7 @@ import {
   parseTransform,
   type TransformParts
 } from './node-primitives';
+import { layerStylingMayOverride } from './css-notice';
 
 export { getNodeFields } from './node-primitives';
 
@@ -31,6 +32,7 @@ export interface SceneLayer {
   readonly hidden: boolean;
   readonly selected: boolean;
   readonly adaptiveRole: AdaptiveRole;
+  readonly hasCss: boolean;
 }
 
 const tagLabels: Record<string, string> = {
@@ -59,7 +61,8 @@ export function listLayers(scene: SvgScene, selectedId: string): readonly SceneL
       ].join(' · '),
       hidden,
       selected: node.id === selectedId,
-      adaptiveRole
+      adaptiveRole,
+      hasCss: layerStylingMayOverride(scene, node.id)
     };
   });
 }
