@@ -14,37 +14,57 @@ export function EditorShell({
   const [appElement, setAppElement] = useState<HTMLElement | null>(null);
 
   return (
-    <main className="if-app" data-theme={theme} ref={setAppElement}>
-      <header className="if-header">
-        <div className="if-brand" aria-label="IconForge open-source icon generator">
-          <span className="if-brand-mark" aria-hidden="true">
+    <main
+      className="if-app grid min-h-screen grid-rows-[auto_minmax(0,1fr)] gap-3 max-[760px]:gap-[10px] overflow-x-hidden bg-background p-[14px] text-foreground max-[760px]:p-[10px]"
+      data-theme={theme}
+      ref={setAppElement}
+    >
+      <header className="mx-auto grid min-h-[68px] w-[min(100%,1180px)] grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-border py-[10px] max-[760px]:grid-cols-[1fr] max-[760px]:items-start">
+        <div
+          className="inline-flex min-w-0 items-center gap-3"
+          aria-label="IconForge open-source icon generator"
+        >
+          <span className="block h-10 w-10 flex-none" aria-hidden="true">
             <IconforgeMark />
           </span>
-          <span className="if-brand-copy">
-            <strong>IconForge</strong>
-            <span className="if-brand-description">Strike while the icon&rsquo;s hot</span>
+          <span className="grid min-w-0 gap-[3px]">
+            <strong className="text-[26px] leading-none tracking-[-0.05em] text-foreground">
+              IconForge
+            </strong>
+            <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[12px] leading-[1.3] text-muted-foreground">
+              Strike while the icon&rsquo;s hot
+            </span>
           </span>
         </div>
 
-        <div className="if-header-actions">
+        <div className="flex flex-wrap items-center justify-end gap-2 max-[760px]:justify-start max-[380px]:flex-col max-[380px]:items-stretch">
           <button
-            className="if-theme-switch"
+            className="relative inline-grid w-[70px] min-h-[38px] cursor-pointer grid-cols-2 items-center rounded-[9px] border border-border bg-secondary p-1 text-muted-foreground outline-none hover:border-border-strong hover:bg-accent focus-visible:[outline:2px_solid_var(--ring)] focus-visible:outline-offset-2"
             type="button"
             role="switch"
             aria-checked={theme === 'light'}
             aria-label="Color theme"
             onClick={onToggleTheme}
           >
-            <span className="if-theme-icon" aria-hidden="true">
+            <span
+              className="relative z-[1] grid place-items-center leading-none [[aria-checked=false]_&]:text-primary-foreground"
+              aria-hidden="true"
+            >
               <MoonIcon />
             </span>
-            <span className="if-theme-thumb" aria-hidden="true" />
-            <span className="if-theme-icon" aria-hidden="true">
+            <span
+              className="absolute bottom-1 left-1 top-1 w-[30px] rounded-[7px] border border-primary bg-primary transition-[transform,background-color,border-color] duration-[140ms] [[aria-checked=true]_&]:translate-x-[32px] [[aria-checked=true]_&]:border-gold [[aria-checked=true]_&]:bg-gold"
+              aria-hidden="true"
+            />
+            <span
+              className="relative z-[1] grid place-items-center leading-none [[aria-checked=true]_&]:text-primary-foreground"
+              aria-hidden="true"
+            >
               <SunIcon />
             </span>
           </button>
           <a
-            className="if-repo-link"
+            className="inline-flex min-h-[38px] items-center gap-[7px] rounded-[9px] border border-border px-3 py-2 text-[13px] text-muted-foreground no-underline outline-none hover:border-border-strong hover:text-foreground focus-visible:[outline:2px_solid_var(--ring)] focus-visible:outline-offset-2"
             href="https://github.com/ntropic-labs/toolbox"
             target="_blank"
             rel="noreferrer"
@@ -64,13 +84,13 @@ export function EditorShell({
 function IconforgeMark() {
   return (
     <svg
-      className="if-brand-mark-svg"
+      className="block h-full w-full"
       viewBox="174.08 174.08 675.84 675.84"
       focusable="false"
       aria-hidden="true"
     >
       <rect
-        className="if-logo-bg"
+        className="hidden [[data-theme=dark]_&]:block"
         x="11"
         y="6"
         width="680"
@@ -101,7 +121,7 @@ function IconforgeMark() {
 function GitHubIcon() {
   return (
     <svg
-      className="if-github-icon"
+      className="h-4 w-4 flex-none fill-current"
       width="16"
       height="16"
       viewBox="0 0 24 24"
@@ -116,7 +136,12 @@ function GitHubIcon() {
 
 function MoonIcon() {
   return (
-    <svg className="if-theme-svg" viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+    <svg
+      className="h-[15px] w-[15px] fill-none stroke-current [stroke-linecap:round] [stroke-linejoin:round] [stroke-width:1.8] [&_path:first-child]:fill-current"
+      viewBox="0 0 20 20"
+      focusable="false"
+      aria-hidden="true"
+    >
       <path d="M13.8 14.9A6.7 6.7 0 0 1 8.2 3.2 7.2 7.2 0 1 0 17 11.8a6.6 6.6 0 0 1-3.2 3.1Z" />
     </svg>
   );
@@ -124,7 +149,12 @@ function MoonIcon() {
 
 function SunIcon() {
   return (
-    <svg className="if-theme-svg" viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+    <svg
+      className="h-[15px] w-[15px] fill-none stroke-current [stroke-linecap:round] [stroke-linejoin:round] [stroke-width:1.8] [&_path:first-child]:fill-current"
+      viewBox="0 0 20 20"
+      focusable="false"
+      aria-hidden="true"
+    >
       <path d="M10 13.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
       <path d="M10 1.7v2.1M10 16.2v2.1M18.3 10h-2.1M3.8 10H1.7M15.9 4.1l-1.5 1.5M5.6 14.4l-1.5 1.5M15.9 15.9l-1.5-1.5M5.6 5.6 4.1 4.1" />
     </svg>

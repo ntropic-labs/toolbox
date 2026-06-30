@@ -26,11 +26,15 @@ export function PreviewModeToggle({
       onValueChange={(value) => {
         if (isPreviewMode(value)) onChange(value);
       }}
-      className="if-mode-toggle"
+      className="flex gap-0.5 rounded-[9px] border border-border bg-input p-[3px]"
       aria-label="Preview, code, or generated-component view"
     >
       {modeOptions.map((option) => (
-        <ToggleGroupItem key={option.value} value={option.value} className="if-mode-option">
+        <ToggleGroupItem
+          key={option.value}
+          value={option.value}
+          className="min-h-[30px] cursor-pointer rounded-md border-none bg-transparent px-[11px] py-[5px] text-[12px] font-medium leading-[1.2] text-muted-foreground transition-colors hover:text-foreground focus-visible:[outline:2px_solid_var(--ring)] focus-visible:[outline-offset:-2px] data-[state=on]:bg-[color-mix(in_srgb,var(--primary)_16%,var(--card))] data-[state=on]:text-foreground data-[state=on]:shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--primary)_52%,transparent)]"
+        >
           {option.label}
         </ToggleGroupItem>
       ))}

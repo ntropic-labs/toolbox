@@ -36,41 +36,66 @@ export function TabDock({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <section className="if-dock" aria-label="Editor controls">
-      <section className="if-card" aria-label="Document">
-        <div className="if-card-head">
-          <span className="if-seclabel">Document</span>
-          <span className="if-pill if-pill-muted">
-            <span className="if-pill-dot" style={{ background: 'var(--if-gold)' }} aria-hidden="true" />
+    <section
+      className="grid max-h-[calc(100vh_-_92px)] min-h-0 min-w-0 content-start gap-3 overflow-auto max-[760px]:order-3 max-[760px]:max-h-none"
+      aria-label="Editor controls"
+    >
+      <section
+        className="grid gap-3 rounded-[10px] border border-border bg-card px-[14px] py-[13px]"
+        aria-label="Document"
+      >
+        <div className="flex items-center justify-between gap-[10px]">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Document
+          </span>
+          <span className="inline-flex items-center gap-[5px] whitespace-nowrap rounded-full border border-border bg-secondary px-2 py-[3px] text-[9.5px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            <span
+              className="h-[5px] w-[5px] rounded-full bg-current"
+              style={{ background: 'var(--gold)' }}
+              aria-hidden="true"
+            />
             Local · Autosaved
           </span>
         </div>
         {documentControls}
       </section>
 
-      <section className="if-card" aria-label="Layers">
-        <div className="if-card-head">
-          <span className="if-seclabel">Layers</span>
-          <div className="if-add-menu">
+      <section
+        className="grid gap-3 rounded-[10px] border border-border bg-card px-[14px] py-[13px]"
+        aria-label="Layers"
+      >
+        <div className="flex items-center justify-between gap-[10px]">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Layers
+          </span>
+          <div className="relative">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="if-create-toggle" type="button">
+                <button
+                  className="inline-flex min-h-[30px] cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-secondary px-2 py-[5px] text-[13px] text-foreground outline-none hover:border-border-strong focus-visible:outline-offset-2 focus-visible:[outline:2px_solid_var(--ring)] aria-expanded:border-border-strong max-[760px]:min-h-[44px]"
+                  type="button"
+                >
                   Add layer
-                  <span className="if-add-caret" aria-hidden="true">▾</span>
+                  <span className="text-[11px] leading-none text-muted-foreground" aria-hidden="true">
+                    ▾
+                  </span>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="if-add-menu-list" aria-label="Add a layer">
+              <DropdownMenuContent
+                className="grid min-w-[168px] gap-0.5 rounded-[10px] border-border-strong p-[5px] shadow-[0_8px_18px_rgb(0_0_0_/_28%)]"
+                aria-label="Add a layer"
+              >
                 {addablePrimitives.map((primitive) => (
                   <DropdownMenuItem
                     key={primitive.kind}
-                    className="if-add-menu-action"
+                    className="block w-full rounded-md px-[9px] py-[7px] text-left text-[13px] text-foreground"
                     onSelect={() => onAddNode(primitive.kind as SceneNodeKind)}
                   >
                     {primitive.label}
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuItem
-                  className="if-add-menu-action"
+                  className="block w-full rounded-md px-[9px] py-[7px] text-left text-[13px] text-foreground"
                   onSelect={() => fileInputRef.current?.click()}
                 >
                   Upload SVG
@@ -79,7 +104,7 @@ export function TabDock({
             </DropdownMenu>
             <input
               ref={fileInputRef}
-              className="if-file-input"
+              className="pointer-events-none absolute h-px w-px opacity-0"
               accept=".svg,image/svg+xml"
               type="file"
               tabIndex={-1}
@@ -90,40 +115,53 @@ export function TabDock({
         </div>
 
         {layers.length === 0 ? (
-          <div className="if-layers-empty">
-            <span className="if-layers-empty-title">No layers yet</span>
-            <p className="if-note">Start from Add layer: rectangle, circle, text, or an uploaded SVG.</p>
+          <div className="grid justify-items-start gap-1 rounded-lg border border-dashed border-border px-[10px] py-3">
+            <span className="text-[12.5px] text-muted-foreground">No layers yet</span>
+            <p className="m-0 text-[11px] leading-[1.45] text-muted-foreground [&_b]:font-semibold [&_b]:text-foreground">
+              Start from Add layer: rectangle, circle, text, or an uploaded SVG.
+            </p>
           </div>
         ) : (
-          <div className="if-layer-list" role="listbox" aria-label="Layers">
+          <div
+            className="grid max-h-[220px] gap-[3px] overflow-auto"
+            role="listbox"
+            aria-label="Layers"
+          >
             {layers.map((layer) => (
               <div
                 key={layer.id}
-                className="if-layer-row"
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-1.5 rounded-[7px] border border-transparent bg-transparent py-1 pl-1.5 pr-1 hover:border-border hover:bg-secondary data-[active]:border-primary data-[active]:bg-[color-mix(in_srgb,var(--primary)_13%,transparent)] max-[760px]:grid-cols-[1fr]"
                 data-active={layer.selected || undefined}
                 data-hidden={layer.hidden || undefined}
               >
                 <button
                   type="button"
-                  className="if-layer-row-select"
+                  className="flex min-w-0 cursor-pointer items-center gap-2 border-0 bg-transparent px-0.5 py-[5px] text-left text-foreground outline-none focus-visible:outline-offset-2 focus-visible:[outline:2px_solid_var(--ring)] max-[760px]:min-h-[44px]"
                   onClick={() => onSelectLayer(layer.id)}
                   role="option"
                   aria-selected={layer.selected}
                 >
-                  <span className="if-layer-row-name">{layer.label}</span>
+                  <span className="overflow-hidden text-ellipsis whitespace-nowrap text-[12.5px] font-semibold [[data-hidden]_&]:text-subtle [[data-hidden]_&]:line-through">
+                    {layer.label}
+                  </span>
                   {layer.hasCss ? (
                     <span
-                      className="if-pill if-pill-ember if-pill-tiny"
+                      className="inline-flex items-center gap-[5px] whitespace-nowrap rounded-full bg-[color-mix(in_srgb,var(--primary)_15%,transparent)] px-[6px] py-[2px] text-[8.5px] font-semibold uppercase tracking-[0.1em] text-primary"
                       title="Colors come from embedded CSS — edit them in the Code tab"
                     >
                       CSS
                     </span>
                   ) : null}
                   {layer.adaptiveRole === 'background' ? (
-                    <span className="if-pill if-pill-muted if-pill-tiny">BG</span>
+                    <span className="inline-flex items-center gap-[5px] whitespace-nowrap rounded-full border border-border bg-secondary px-[6px] py-[2px] text-[8.5px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                      BG
+                    </span>
                   ) : null}
                 </button>
-                <div className="if-layer-row-actions" aria-label={`${layer.label} layer actions`}>
+                <div
+                  className="flex flex-wrap justify-end gap-1 max-[760px]:justify-start max-[760px]:gap-1.5"
+                  aria-label={`${layer.label} layer actions`}
+                >
                   <LayerAction
                     label={layer.hidden ? 'Show layer' : 'Hide layer'}
                     onClick={() => onToggleLayerVisible(layer)}
@@ -149,16 +187,23 @@ export function TabDock({
         )}
       </section>
 
-      <section className="if-card" aria-label="Adjust selected layer">
-        <div className="if-card-head">
-          <span className="if-seclabel">Adjust</span>
+      <section
+        className="grid gap-3 rounded-[10px] border border-border bg-card px-[14px] py-[13px]"
+        aria-label="Adjust selected layer"
+      >
+        <div className="flex items-center justify-between gap-[10px]">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Adjust
+          </span>
           {selectedLabel ? (
-            <span className="if-pill if-pill-ember">
-              <span className="if-pill-dot" aria-hidden="true" />
+            <span className="inline-flex items-center gap-[5px] whitespace-nowrap rounded-full bg-[color-mix(in_srgb,var(--primary)_15%,transparent)] px-2 py-[3px] text-[9.5px] font-semibold uppercase tracking-[0.12em] text-primary">
+              <span className="h-[5px] w-[5px] rounded-full bg-current" aria-hidden="true" />
               {selectedLabel}
             </span>
           ) : (
-            <span className="if-pill if-pill-muted">No layer</span>
+            <span className="inline-flex items-center gap-[5px] whitespace-nowrap rounded-full border border-border bg-secondary px-2 py-[3px] text-[9.5px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+              No layer
+            </span>
           )}
         </div>
         {adjustControls}
@@ -214,7 +259,11 @@ function LayerIcon({ name }: { readonly name: LayerIconName }) {
   };
 
   return (
-    <svg className="if-layer-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <svg
+      className="h-[15px] w-[15px] fill-none stroke-current [stroke-linecap:round] [stroke-linejoin:round] [stroke-width:1.9]"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
       {paths[name]}
     </svg>
   );
@@ -233,7 +282,7 @@ function LayerAction({
 }) {
   return (
     <button
-      className="if-layer-action"
+      className="grid h-[26px] w-[26px] place-items-center rounded-md border border-transparent bg-transparent p-0 text-[13px] leading-none text-muted-foreground outline-none hover:border-border hover:bg-card hover:text-foreground focus-visible:outline-offset-2 focus-visible:[outline:2px_solid_var(--ring)] disabled:cursor-not-allowed disabled:opacity-[0.42] data-[danger]:hover:border-[color-mix(in_srgb,var(--destructive)_50%,var(--border))] data-[danger]:hover:text-destructive max-[760px]:h-[44px] max-[760px]:w-[44px]"
       data-danger={danger || undefined}
       type="button"
       aria-label={label}

@@ -27,14 +27,14 @@ describe('CodeView', () => {
   it('lists each diagnostic message when the source is invalid', () => {
     const html = render({ value: '<svg>', diagnostics: [{ message: 'Unclosed tag svg.' }] });
 
-    expect(html).toContain('if-code-diagnostics');
+    expect(html).toContain('<ul');
     expect(html).toContain('Unclosed tag svg.');
   });
 
   it('renders no diagnostics list when the source is valid', () => {
     const html = render();
 
-    expect(html).not.toContain('if-code-diagnostics');
+    expect(html).not.toContain('<ul');
   });
 
   it('offers Prettify and Optimize actions above the editor', () => {

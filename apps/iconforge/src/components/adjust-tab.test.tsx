@@ -25,7 +25,7 @@ describe('DocumentControls color fields', () => {
     );
 
     expect(html).toContain('aria-label="Open Background color picker"');
-    expect(html).toContain('class="if-color-swatch-button"');
+    expect(html).toContain('background:#336699');
     expect(html).not.toContain('react-colorful');
   });
 
@@ -134,7 +134,7 @@ describe('AdjustTab attribute fields', () => {
     );
 
     expect(html).toContain('value="Hi"');
-    expect(html).toContain('<span>Text</span>');
+    expect(html).toContain('>Text</span>');
   });
 
   it('offers a foreground/background adaptive role control reflecting the current tag', () => {

@@ -5,11 +5,11 @@ import type { ThemeMode } from '../theme';
 const appChrome = EditorView.theme({
   '&': {
     height: '100%',
-    backgroundColor: 'var(--if-panel)',
-    color: 'var(--if-text)'
+    backgroundColor: 'var(--card)',
+    color: 'var(--foreground)'
   },
   '&.cm-focused': {
-    outline: '2px solid var(--if-focus)',
+    outline: '2px solid var(--ring)',
     outlineOffset: '-2px'
   },
   '.cm-scroller': {
@@ -22,7 +22,7 @@ const appChrome = EditorView.theme({
   },
   '.cm-gutters': {
     backgroundColor: 'transparent',
-    color: 'var(--if-subtle)',
+    color: 'var(--subtle)',
     border: 'none',
     paddingLeft: '10px'
   }

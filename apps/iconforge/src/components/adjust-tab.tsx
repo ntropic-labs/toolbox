@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { HexColorInput, HexColorPicker } from 'react-colorful';
 import type { SvgNode } from '@toolbox/svg-core';
-import { Alert, Button, Popover, PopoverContent, PopoverTrigger } from '@toolbox/ui';
+import { Alert, Button, cn, Popover, PopoverContent, PopoverTrigger } from '@toolbox/ui';
 import { getAdaptiveRole, getNodeFields, type AdaptiveRole } from '../scene-editor';
 import type { TextShadow } from '../text-effects';
 import {
@@ -9,6 +9,7 @@ import {
   FieldInput,
   FieldSelect,
   InfoDot,
+  inputClass,
   NumberField,
   SegmentedControl,
   Toggle
@@ -37,7 +38,7 @@ export function DocumentControls({
   const currentColor = backgroundColor === 'transparent' ? '#ffffff' : backgroundColor;
 
   return (
-    <div className="if-document-controls">
+    <div className="grid gap-[10px]">
       <Field label="Project name">
         <FieldInput
           value={projectName}
@@ -45,9 +46,9 @@ export function DocumentControls({
           onChange={(event) => onRenameProject(event.target.value)}
         />
       </Field>
-      <div className="if-doc-actions">
+      <div className="grid grid-cols-2 gap-2">
         {openControl}
-        <Button variant="secondary" type="button" onClick={onDownloadProject}>
+        <Button variant="secondary" type="button" className="w-full" onClick={onDownloadProject}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 3v12" />
             <path d="m7 10 5 5 5-5" />
@@ -56,11 +57,13 @@ export function DocumentControls({
           Download
         </Button>
       </div>
-      <p className="if-note">
+      <p className="m-0 text-[11px] leading-[1.45] text-muted-foreground [&_b]:font-semibold [&_b]:text-foreground">
         Projects are kept in this browser. <b>Download</b> saves a copy as a <b>.json</b> file.
       </p>
-      <div className="if-field">
-        <span>Background</span>
+      <div className="relative grid min-w-0 gap-[5px] text-[12px] text-muted-foreground">
+        <span className="text-[9.5px] font-medium uppercase leading-none tracking-[0.12em] text-muted-foreground">
+          Background
+        </span>
         <SegmentedControl
           value={backgroundMode}
           options={[
@@ -76,7 +79,7 @@ export function DocumentControls({
       {backgroundMode === 'color' ? (
         <ColorField label="Background color" value={currentColor} onChange={onChangeBackground} />
       ) : null}
-      <div className="if-toggle-row">
+      <div className="flex items-center justify-between gap-2">
         <Toggle checked={showSafeGuide} onChange={onToggleSafeGuide} label="Safe-area guide" />
         <InfoDot label="Keep key content inside the circle; it stays visible under every Android adaptive mask." />
       </div>
@@ -136,7 +139,11 @@ export function AdjustTab({
   readonly onSetShadow?: (shadow: TextShadow | null) => void;
 }) {
   if (!node) {
-    return <p className="if-dock-note">Add or select a layer to adjust it.</p>;
+    return (
+      <p className="m-0 text-[13px] leading-[1.45] text-muted-foreground">
+        Add or select a layer to adjust it.
+      </p>
+    );
   }
 
   const isTextNode = node.tag.toLowerCase() === 'text';
@@ -244,7 +251,7 @@ export function AdjustTab({
   };
 
   return (
-    <div className="if-adjust-tab">
+    <div className="grid gap-3">
       {nameField ? renderField(nameField) : null}
       {contentField ? renderField(contentField) : null}
 
@@ -256,10 +263,10 @@ export function AdjustTab({
       ) : null}
 
       {showFontControls ? (
-        <div className="if-adjust-group">
-          <div className="if-subhead">Typeface</div>
+        <div className="grid gap-2">
+          <div className="text-[9.5px] font-medium uppercase tracking-[0.16em] text-muted-foreground">Typeface</div>
           <Field label="Font" wide>
-            <div className="if-font-row">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
               <FieldInput
                 value={fontInput ?? ''}
                 placeholder="Google font name or URL"
@@ -297,7 +304,7 @@ export function AdjustTab({
             </Field>
           ) : null}
           {onUploadFont ? (
-            <label className="if-font-upload">
+            <label className="grid gap-1 text-[11px] text-muted-foreground">
               <span>or upload a font file</span>
               <input
                 type="file"
@@ -311,19 +318,19 @@ export function AdjustTab({
             </label>
           ) : null}
           {fontStatus.state === 'error' ? (
-            <p className="if-note" role="alert">
+            <p className="m-0 text-[11px] leading-[1.45] text-muted-foreground [&_b]:font-semibold [&_b]:text-foreground" role="alert">
               {fontStatus.message}
             </p>
           ) : fontStatus.state === 'loaded' ? (
-            <p className="if-note">Loaded {fontStatus.message}.</p>
+            <p className="m-0 text-[11px] leading-[1.45] text-muted-foreground [&_b]:font-semibold [&_b]:text-foreground">Loaded {fontStatus.message}.</p>
           ) : null}
         </div>
       ) : null}
 
       {showTransform || sizeFields.length > 0 ? (
-        <div className="if-adjust-group">
-          <div className="if-subhead">Position &amp; size</div>
-          <div className="if-field-grid">
+        <div className="grid gap-2">
+          <div className="text-[9.5px] font-medium uppercase tracking-[0.16em] text-muted-foreground">Position &amp; size</div>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(92px,1fr))] gap-[9px] [&>[data-wide]]:col-span-2">
             {center && onSetCenter ? (
               <>
                 <NumberField
@@ -352,7 +359,7 @@ export function AdjustTab({
             <Button
               variant="secondary"
               type="button"
-              className="if-center-btn"
+              className="w-full self-end"
               onClick={onCenter}
               title="Center the layer on the canvas"
             >
@@ -366,14 +373,14 @@ export function AdjustTab({
       ) : null}
 
       {appearanceFields.length > 0 ? (
-        <div className="if-adjust-group">
-          <div className="if-subhead">Appearance</div>
-          <div className="if-field-grid">{appearanceFields.map(renderField)}</div>
+        <div className="grid gap-2">
+          <div className="text-[9.5px] font-medium uppercase tracking-[0.16em] text-muted-foreground">Appearance</div>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(92px,1fr))] gap-[9px] [&>[data-wide]]:col-span-2">{appearanceFields.map(renderField)}</div>
         </div>
       ) : null}
 
-      <div className="if-adjust-group">
-        <div className="if-subhead if-subhead-info">
+      <div className="grid gap-2">
+        <div className="flex items-center gap-1.5 text-[9.5px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
           Adaptive role
           <InfoDot label="Tags the Android adaptive icon split: which layers are background vs foreground. Untagged layers are auto-detected." />
         </div>
@@ -389,8 +396,8 @@ export function AdjustTab({
       </div>
 
       {showShadow ? (
-        <div className="if-adjust-group">
-          <div className="if-subhead">Shadow</div>
+        <div className="grid gap-2">
+          <div className="text-[9.5px] font-medium uppercase tracking-[0.16em] text-muted-foreground">Shadow</div>
           <Toggle
             checked={shadow != null}
             onChange={(on) =>
@@ -399,7 +406,7 @@ export function AdjustTab({
             label="Drop shadow"
           />
           {shadow != null ? (
-            <div className="if-field-grid">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(92px,1fr))] gap-[9px] [&>[data-wide]]:col-span-2">
               <NumberField
                 label="Shadow X"
                 value={shadow.dx}
@@ -426,7 +433,7 @@ export function AdjustTab({
       ) : null}
 
       {showFontControls ? (
-        <div className="if-adjust-actions">
+        <div className="mb-2 flex justify-end">
           <Button
             variant="secondary"
             type="button"
@@ -464,26 +471,31 @@ function ColorField({
 }) {
   const hex = toHexColor(value);
   return (
-    <div className="if-color-field">
-      <span>{label}</span>
-      <div className="if-color-control-row">
-        <div className="if-color-swatch-anchor">
+    <div
+      className="grid min-w-0 gap-[5px] data-[disabled]:pointer-events-none data-[disabled]:opacity-[0.52]"
+      data-wide
+    >
+      <span className="text-[9.5px] font-medium uppercase leading-none tracking-[0.12em] text-muted-foreground">
+        {label}
+      </span>
+      <div className="grid min-w-0 grid-cols-[42px_minmax(0,1fr)] items-center gap-2">
+        <div className="relative min-w-0">
           <Popover>
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="if-color-swatch-button"
+                className="grid h-[34px] w-full cursor-pointer place-items-stretch overflow-hidden rounded-lg border border-border bg-secondary p-0 outline-none transition-[border-color,background-color] hover:border-border-strong hover:bg-accent focus-visible:border-primary focus-visible:shadow-[0_0_0_2px_color-mix(in_srgb,var(--primary)_28%,transparent)]"
                 aria-label={`Open ${label} picker`}
               >
                 <span
-                  className="if-color-swatch-chip"
+                  className="h-full w-full shadow-[inset_0_0_0_1px_color-mix(in_srgb,#000_30%,transparent)]"
                   style={{ background: hex }}
                   aria-hidden="true"
                 />
               </button>
             </PopoverTrigger>
             <PopoverContent
-              className="if-color-popover"
+              className="if-color-popover w-[min(252px,calc(100vw_-_36px))] rounded-[10px] border-border-strong shadow-[0_8px_18px_rgb(0_0_0_/_28%)]"
               align="start"
               role="dialog"
               aria-label={`${label} picker`}
@@ -496,7 +508,7 @@ function ColorField({
           color={hex}
           onChange={onChange}
           prefixed
-          className="if-input if-hex-input"
+          className={cn(inputClass, 'uppercase')}
           aria-label={`${label} hex value`}
         />
       </div>

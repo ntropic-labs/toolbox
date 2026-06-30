@@ -479,15 +479,18 @@ export function App() {
 
   return (
     <EditorShell onToggleTheme={toggleTheme} theme={theme}>
-      <div className="if-editor-body">
-        <div className="if-preview-column">
-          <div className="if-preview-toolbar">
+      <div className="mx-auto grid min-h-0 w-[min(100%,1180px)] grid-cols-[minmax(0,1fr)_minmax(340px,420px)] items-stretch gap-5 max-[760px]:grid-cols-[1fr]">
+        <div className="grid min-h-0 min-w-0 content-start justify-items-center gap-[10px] [--stage-w:min(100%,calc(100vh_-_196px))] max-[760px]:contents">
+          <div className="grid w-[var(--stage-w)] grid-cols-[minmax(0,1fr)_auto] items-center gap-[10px] max-[760px]:order-1 max-[760px]:grid-cols-[1fr] max-[760px]:justify-items-stretch max-[760px]:gap-1">
             <PreviewModeToggle mode={mode} onChange={changeMode} />
-            <div className="if-toolbar-actions" aria-label="History controls">
-              <div className="if-toolbar-buttons">
+            <div
+              className="grid justify-items-end gap-1 max-[760px]:justify-items-start"
+              aria-label="History controls"
+            >
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
-                  className="if-iconbtn"
+                  className="grid h-[30px] w-[30px] cursor-pointer place-items-center rounded-lg border border-border bg-secondary text-muted-foreground outline-none transition-colors enabled:hover:border-border-strong enabled:hover:text-foreground focus-visible:[outline:2px_solid_var(--ring)] focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-[0.42] [&_svg]:h-[15px] [&_svg]:w-[15px] [&_svg]:fill-none [&_svg]:stroke-current [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round] [&_svg]:[stroke-width:2]"
                   aria-label="Undo last change with Ctrl or Command Z"
                   title="Undo (Ctrl/Cmd Z)"
                   onClick={undo}
@@ -500,7 +503,7 @@ export function App() {
                 </button>
                 <button
                   type="button"
-                  className="if-iconbtn"
+                  className="grid h-[30px] w-[30px] cursor-pointer place-items-center rounded-lg border border-border bg-secondary text-muted-foreground outline-none transition-colors enabled:hover:border-border-strong enabled:hover:text-foreground focus-visible:[outline:2px_solid_var(--ring)] focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-[0.42] [&_svg]:h-[15px] [&_svg]:w-[15px] [&_svg]:fill-none [&_svg]:stroke-current [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round] [&_svg]:[stroke-width:2]"
                   aria-label="Redo last change with Ctrl or Command Y"
                   title="Redo (Ctrl/Cmd Y)"
                   onClick={redo}

@@ -28,13 +28,20 @@ export function CanvasPreview({
   readonly selectionBox?: SelectionBox | null;
 }) {
   return (
-    <section className="if-preview" aria-label="Canvas preview">
-      <div className="if-canvas-frame">
+    <section
+      className="grid min-h-0 w-full min-w-0 place-items-center max-[760px]:order-2"
+      aria-label="Canvas preview"
+    >
+      <div className="aspect-square w-[var(--stage-w)] rounded-[10px] border border-border bg-card p-[clamp(10px,1.8vw,18px)] max-[760px]:w-[min(100%,calc(100vw_-_20px))]">
         <div
-          className="if-canvas-stage"
+          className="relative h-full w-full overflow-hidden rounded-lg bg-canvas data-[transparent]:bg-[#f7f8fa] data-[transparent]:[background-image:linear-gradient(45deg,#c9ced6_25%,transparent_25%),linear-gradient(-45deg,#c9ced6_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#c9ced6_75%),linear-gradient(-45deg,transparent_75%,#c9ced6_75%)] data-[transparent]:[background-position:0_0,0_8px,8px_-8px,-8px_0] data-[transparent]:[background-size:16px_16px]"
           data-transparent={background === 'transparent' || undefined}
         >
-          <canvas ref={canvasRef} className="if-canvas" aria-label="Icon preview canvas" />
+          <canvas
+            ref={canvasRef}
+            className="block h-full w-full rounded-lg"
+            aria-label="Icon preview canvas"
+          />
           {showSafeGuide ? <SafeGuides /> : null}
           {selectionBox ? <SelectionChrome box={selectionBox} /> : null}
         </div>
@@ -46,7 +53,7 @@ export function CanvasPreview({
 function SelectionChrome({ box }: { readonly box: SelectionBox }) {
   return (
     <div
-      className="if-selection"
+      className="pointer-events-none absolute rounded-[3px] [border:1.5px_dashed_var(--primary)]"
       aria-hidden="true"
       style={{
         left: `${box.left}%`,
@@ -55,19 +62,25 @@ function SelectionChrome({ box }: { readonly box: SelectionBox }) {
         height: `${box.height}%`
       }}
     >
-      <span className="if-selection-handle" data-corner="tl" />
-      <span className="if-selection-handle" data-corner="tr" />
-      <span className="if-selection-handle" data-corner="bl" />
-      <span className="if-selection-handle" data-corner="br" />
+      <span className="absolute -left-1 -top-1 h-[7px] w-[7px] rounded-[1px] bg-primary" />
+      <span className="absolute -right-1 -top-1 h-[7px] w-[7px] rounded-[1px] bg-primary" />
+      <span className="absolute -bottom-1 -left-1 h-[7px] w-[7px] rounded-[1px] bg-primary" />
+      <span className="absolute -bottom-1 -right-1 h-[7px] w-[7px] rounded-[1px] bg-primary" />
     </div>
   );
 }
 
 function SafeGuides() {
   return (
-    <div className="if-safe-guide" aria-hidden="true">
-      <div className="if-safe-mask" style={{ inset: inset(maskRatio) }} />
-      <div className="if-safe-circle" style={{ inset: inset(safeRatio) }} />
+    <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div
+        className="absolute rounded-[8%] [border:2px_dashed_color-mix(in_srgb,var(--destructive)_62%,transparent)]"
+        style={{ inset: inset(maskRatio) }}
+      />
+      <div
+        className="absolute rounded-full [border:2px_dashed_color-mix(in_srgb,var(--destructive)_80%,transparent)]"
+        style={{ inset: inset(safeRatio) }}
+      />
     </div>
   );
 }

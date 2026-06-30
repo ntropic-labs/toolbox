@@ -5,14 +5,14 @@ import type { ThemeMode } from '../theme';
 const appChrome = EditorView.theme({
   '&': {
     height: '100%',
-    backgroundColor: 'var(--if-panel)',
-    color: 'var(--if-text)'
+    backgroundColor: 'var(--card)',
+    color: 'var(--foreground)'
   },
   '.cm-scroller': { fontFamily: 'inherit', fontSize: '12px', lineHeight: '1.5' },
   '.cm-content': { padding: '12px 6px' },
   '.cm-gutters': {
     backgroundColor: 'transparent',
-    color: 'var(--if-subtle)',
+    color: 'var(--subtle)',
     border: 'none',
     paddingLeft: '10px'
   }
