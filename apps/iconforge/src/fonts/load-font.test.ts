@@ -63,6 +63,19 @@ describe('loadGoogleFont', () => {
 
     expect(font.variationAxes.some((axis) => axis.tag === 'wght')).toBe(true);
   });
+
+  it('falls back to a single-weight request when the range request is rejected', async () => {
+    const fetchImpl = (url: string): Promise<Response> => {
+      if (url.includes('wght@100..900')) return Promise.resolve(new Response('bad', { status: 400 }));
+      if (url.includes('css2')) return Promise.resolve(new Response(css, { status: 200 }));
+      return Promise.resolve(new Response(fontArrayBuffer, { status: 200 }));
+    };
+
+    const font = await loadGoogleFont('Demo', { fetchImpl });
+
+    expect(font.familyName.length).toBeGreaterThan(0);
+    expect(getLoadedFont(font.familyName)).toBe(font);
+  });
 });
 
 describe('loadFontFromFile', () => {

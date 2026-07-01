@@ -132,10 +132,7 @@ export function TextTypeControls({
             axis={wdth}
             value={parseWidth(node.attributes['font-stretch'], wdth.default)}
             onChange={(value) =>
-              onUpdateField(
-                'font-stretch',
-                value === wdth.default ? '' : `${Math.round(value)}%`
-              )
+              onUpdateField('font-stretch', value === wdth.default ? '' : `${Math.round(value)}%`)
             }
           />
         ) : null}
@@ -173,7 +170,10 @@ export function TextTypeControls({
         />
 
         <Field label="Case" wide>
-          <FieldSelect value={caseValue} onChange={(event) => onSetTextTransform(event.target.value)}>
+          <FieldSelect
+            value={caseValue}
+            onChange={(event) => onSetTextTransform(event.target.value)}
+          >
             {caseOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}

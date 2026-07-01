@@ -18,7 +18,9 @@ beforeAll(async () => {
     bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     'LiberationSans-Regular.ttf'
   );
-  const variableBytes = readFileSync(new URL('../test-fixtures/Oswald-Variable.ttf', import.meta.url));
+  const variableBytes = readFileSync(
+    new URL('../test-fixtures/Oswald-Variable.ttf', import.meta.url)
+  );
   variableFont = await loadFromBuffer(
     variableBytes.buffer.slice(
       variableBytes.byteOffset,
