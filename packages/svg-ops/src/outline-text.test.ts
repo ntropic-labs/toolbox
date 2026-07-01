@@ -4,9 +4,11 @@ import { parseSvg, serializeSvg, type SvgNode, type SvgScene } from '@toolbox/sv
 import { loadFromBuffer } from './parse-font';
 import type { LoadedFont } from './loaded-font';
 import { outlineSvgSceneText } from './index';
+import { parseTextVariations } from './outline-text';
 import { requireScene } from './test-support';
 
 let font: LoadedFont;
+let variableFont: LoadedFont;
 
 beforeAll(async () => {
   const bytes = readFileSync(
@@ -15,6 +17,14 @@ beforeAll(async () => {
   font = await loadFromBuffer(
     bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
     'LiberationSans-Regular.ttf'
+  );
+  const variableBytes = readFileSync(new URL('../test-fixtures/Oswald-Variable.ttf', import.meta.url));
+  variableFont = await loadFromBuffer(
+    variableBytes.buffer.slice(
+      variableBytes.byteOffset,
+      variableBytes.byteOffset + variableBytes.byteLength
+    ),
+    'Oswald-Variable.ttf'
   );
 });
 
@@ -35,6 +45,51 @@ function pathNumbers(group: SvgNode): { xs: number[]; ys: number[] } {
 }
 
 describe('outlineSvgSceneText', () => {
+  it('maps text attributes to font variation values', () => {
+    expect(
+      parseTextVariations({
+        'font-weight': '637',
+        'font-stretch': '85%',
+        'font-style': 'oblique 12deg'
+      })
+    ).toEqual({ wght: 637, wdth: 85, slnt: -12 });
+    expect(parseTextVariations({ 'font-style': 'italic' })).toEqual({});
+    expect(parseTextVariations({})).toEqual({});
+  });
+
+  it('outlines heavier weight with wider geometry than lighter weight', () => {
+    const build = (weight: string) =>
+      requireScene(
+        `<svg viewBox="0 0 64 64"><text x="4" y="40" font-size="32" font-weight="${weight}">HH</text></svg>`
+      );
+    const spanFor = (weight: string) => {
+      const scene = build(weight);
+      const group = outlineSvgSceneText(scene, { nodeId: textNodeId(scene), font: variableFont })
+        .scene.root.children[0]!;
+      const xs = pathNumbers(group).xs;
+      return Math.max(...xs) - Math.min(...xs);
+    };
+    expect(spanFor('700')).toBeGreaterThan(spanFor('200'));
+  });
+
+  it('applies text-transform before outlining', () => {
+    const dOf = (scene: SvgScene) =>
+      outlineSvgSceneText(scene, { nodeId: textNodeId(scene), font: variableFont })
+        .scene.root.children[0]!.children.map((path) => path.attributes.d)
+        .join('|');
+    const lower = requireScene(
+      '<svg viewBox="0 0 64 64"><text x="4" y="40" font-size="32">abc</text></svg>'
+    );
+    const upperViaTransform = requireScene(
+      '<svg viewBox="0 0 64 64"><text x="4" y="40" font-size="32" style="text-transform:uppercase">abc</text></svg>'
+    );
+    const upperPlain = requireScene(
+      '<svg viewBox="0 0 64 64"><text x="4" y="40" font-size="32">ABC</text></svg>'
+    );
+    expect(dOf(upperViaTransform)).toBe(dOf(upperPlain));
+    expect(dOf(upperViaTransform)).not.toBe(dOf(lower));
+  });
+
   it('replaces the target text node in place with a group of outlined paths', () => {
     const scene = requireScene(
       '<svg viewBox="0 0 24 24"><rect width="4" height="4" /><text x="2" y="20" font-size="16">Hi</text></svg>'

@@ -20,11 +20,56 @@ const consumedTextAttributes = new Set([
   'font-size',
   'font-family',
   'font-weight',
+  'font-stretch',
   'font-style',
   'text-anchor',
   'letter-spacing',
+  'word-spacing',
+  'text-transform',
+  'text-decoration',
+  'style',
   'dominant-baseline'
 ]);
+
+export function parseTextVariations(
+  attributes: Readonly<Record<string, string>>
+): Record<string, number> {
+  const variations: Record<string, number> = {};
+  if (attributes['font-weight'] !== undefined) {
+    const weight = Number(attributes['font-weight'].trim());
+    if (Number.isFinite(weight)) variations.wght = weight;
+  }
+  if (attributes['font-stretch'] !== undefined) {
+    const stretch = Number(attributes['font-stretch'].trim().replace(/%$/u, ''));
+    if (Number.isFinite(stretch)) variations.wdth = stretch;
+  }
+  const oblique = /oblique\s+(-?[\d.]+)deg/iu.exec(attributes['font-style'] ?? '');
+  if (oblique) variations.slnt = -Number(oblique[1]);
+  return variations;
+}
+
+function readTextTransform(attributes: Readonly<Record<string, string>>): string | null {
+  const styleMatch = /text-transform\s*:\s*([a-z-]+)/iu.exec(attributes.style ?? '');
+  const value = (styleMatch?.[1] ?? attributes['text-transform'] ?? '').toLowerCase();
+  return value.length > 0 ? value : null;
+}
+
+function applyTextTransform(text: string, transform: string | null): string {
+  switch (transform) {
+    case 'uppercase':
+      return text.toUpperCase();
+    case 'lowercase':
+      return text.toLowerCase();
+    case 'capitalize':
+      return text.replace(/\b\p{L}/gu, (char) => char.toUpperCase());
+    default:
+      return text;
+  }
+}
+
+function isSpaceGlyph(glyph: { readonly codePoints: readonly number[] }): boolean {
+  return glyph.codePoints.length === 1 && glyph.codePoints[0] === 0x20;
+}
 
 export function outlineSvgSceneText(
   scene: SvgScene,
@@ -48,15 +93,22 @@ export function outlineSvgSceneText(
     }
   }
 
-  const text = nodeText(target)
-    .replace(/[\t\n\r]+/gu, ' ')
-    .replace(/ {2,}/gu, ' ')
-    .trim();
+  const text = applyTextTransform(
+    nodeText(target)
+      .replace(/[\t\n\r]+/gu, ' ')
+      .replace(/ {2,}/gu, ' ')
+      .trim(),
+    readTextTransform(target.attributes)
+  );
   if (text.length === 0) {
     return { scene, warnings: [...warnings, 'The text element is empty; nothing to outline.'] };
   }
 
-  const font = options.font;
+  if (target.attributes['text-decoration'] !== undefined) {
+    warnings.push('text-decoration is not drawn as an outline and was dropped.');
+  }
+
+  const source = options.font.variant(parseTextVariations(target.attributes));
   const fontSize = readNumericAttribute(
     target,
     'font-size',
@@ -66,15 +118,16 @@ export function outlineSvgSceneText(
   const x = readNumericAttribute(target, 'x', 0, warnings);
   const y = readNumericAttribute(target, 'y', 0, warnings);
   const letterSpacing = readNumericAttribute(target, 'letter-spacing', 0, warnings);
+  const wordSpacing = readNumericAttribute(target, 'word-spacing', 0, warnings);
   const anchor = (target.attributes['text-anchor'] ?? 'start').trim().toLowerCase();
-  const scale = fontSize / font.unitsPerEm;
+  const scale = fontSize / source.unitsPerEm;
 
-  const glyphs = font.layout(text).glyphs;
+  const glyphs = source.layout(text).glyphs;
   for (const glyph of glyphs) {
     if (!glyph.mapped) {
       const name = String.fromCodePoint(...glyph.codePoints);
       warnings.push(
-        `"${name}" has no glyph in ${font.familyName} and was skipped; spacing was adjusted.`
+        `"${name}" has no glyph in ${source.familyName} and was skipped; spacing was adjusted.`
       );
     }
   }
@@ -84,9 +137,11 @@ export function outlineSvgSceneText(
     return { scene, warnings: [...warnings, 'No characters could be outlined with this font.'] };
   }
 
+  const spaceCount = mappedGlyphs.filter(isSpaceGlyph).length;
   const totalAdvance =
     mappedGlyphs.reduce((sum, glyph) => sum + glyph.advance * scale, 0) +
-    letterSpacing * Math.max(0, mappedGlyphs.length - 1);
+    letterSpacing * Math.max(0, mappedGlyphs.length - 1) +
+    wordSpacing * spaceCount;
   const startX =
     anchor === 'middle' ? x - totalAdvance / 2 : anchor === 'end' ? x - totalAdvance : x;
 
@@ -100,7 +155,7 @@ export function outlineSvgSceneText(
     if (d.length > 0) {
       paths.push(createElementNode('path', { d }));
     }
-    pen += glyph.advance * scale + letterSpacing;
+    pen += glyph.advance * scale + letterSpacing + (isSpaceGlyph(glyph) ? wordSpacing : 0);
   }
 
   const carriedAttributes = Object.fromEntries(
