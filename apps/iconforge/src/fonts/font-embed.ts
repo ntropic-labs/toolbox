@@ -1,4 +1,5 @@
 import type { SvgNode, SvgScene } from '@toolbox/svg-core';
+import type { FontAxis } from '@toolbox/svg-ops';
 import { familyKey } from './family-key';
 
 // The live preview is a <canvas> that rasterizes the scene as an <img>; an SVG loaded as an
@@ -25,14 +26,27 @@ function toBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
-export function embedFontSource(family: string, buffer: ArrayBuffer): void {
+export function embedFontSource(
+  family: string,
+  buffer: ArrayBuffer,
+  axes: readonly FontAxis[] = []
+): void {
   const bytes = new Uint8Array(buffer);
   const { mime, format } = detectFont(bytes);
   const dataUrl = `data:${mime};base64,${toBase64(bytes)}`;
   fontFaceRules.set(
     familyKey(family),
-    `@font-face{font-family:'${family}';src:url(${dataUrl}) format('${format}');}`
+    `@font-face{font-family:'${family}';src:url(${dataUrl}) format('${format}');${axisDescriptors(axes)}}`
   );
+}
+
+function axisDescriptors(axes: readonly FontAxis[]): string {
+  const wght = axes.find((axis) => axis.tag === 'wght');
+  const wdth = axes.find((axis) => axis.tag === 'wdth');
+  let descriptors = '';
+  if (wght) descriptors += `font-weight:${wght.min} ${wght.max};`;
+  if (wdth) descriptors += `font-stretch:${wdth.min}% ${wdth.max}%;`;
+  return descriptors;
 }
 
 export function previewFontFaceCss(scene: SvgScene): string {

@@ -20,6 +20,22 @@ const css = `@font-face {
   unicode-range: U+0000-00FF;
 }`;
 
+const oswaldBytes = readFileSync(
+  new URL('../../../../packages/svg-ops/test-fixtures/Oswald-Variable.ttf', import.meta.url)
+);
+const oswaldBuffer = oswaldBytes.buffer.slice(
+  oswaldBytes.byteOffset,
+  oswaldBytes.byteOffset + oswaldBytes.byteLength
+);
+
+const variableCss = `@font-face {
+  font-family: 'Oswald';
+  font-style: normal;
+  font-weight: 100 900;
+  src: url(https://fonts.gstatic.com/s/oswald/v1/oswald.woff2) format('woff2');
+  unicode-range: U+0000-00FF;
+}`;
+
 function fakeFetch(cssText: string, bytes: ArrayBuffer) {
   return (url: string): Promise<Response> => {
     if (url.includes('css2') || url.includes('/css?')) {
@@ -38,6 +54,14 @@ describe('loadGoogleFont', () => {
     expect(font.familyName.length).toBeGreaterThan(0);
     expect(font.layout('Hi').glyphs.length).toBe(2);
     expect(getLoadedFont(font.familyName)).toBe(font);
+  });
+
+  it('exposes variation axes for a variable font', async () => {
+    const font = await loadGoogleFont('Oswald', {
+      fetchImpl: fakeFetch(variableCss, oswaldBuffer)
+    });
+
+    expect(font.variationAxes.some((axis) => axis.tag === 'wght')).toBe(true);
   });
 });
 

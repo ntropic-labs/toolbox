@@ -26,10 +26,10 @@ export async function loadGoogleFont(
     weight = parsed.weights[0] ?? 400;
   } else {
     family = input.trim();
-    cssUrl = googleCss2Url(family, weight);
+    cssUrl = googleCss2Url(family);
   }
 
-  const cacheKey = `${family.toLowerCase()}#${weight}`;
+  const cacheKey = family.toLowerCase();
   let bytes = await getCachedFont(cacheKey);
   if (!bytes) {
     const cssResponse = await fetchImpl(cssUrl);
@@ -41,9 +41,9 @@ export async function loadGoogleFont(
     await putCachedFont(cacheKey, bytes);
   }
 
-  const font = await loadFromBuffer(bytes, family, { weight });
+  const font = await loadFromBuffer(bytes, family);
   registerFont(font);
-  embedFontSource(font.familyName, bytes);
+  embedFontSource(font.familyName, bytes, font.variationAxes);
   await registerFontFace(font.familyName, bytes);
   return font;
 }
@@ -52,7 +52,7 @@ export async function loadFontFromFile(file: File): Promise<LoadedFont> {
   const bytes = await file.arrayBuffer();
   const font = await loadFromBuffer(bytes, file.name);
   registerFont(font);
-  embedFontSource(font.familyName, bytes);
+  embedFontSource(font.familyName, bytes, font.variationAxes);
   await registerFontFace(font.familyName, bytes);
   return font;
 }

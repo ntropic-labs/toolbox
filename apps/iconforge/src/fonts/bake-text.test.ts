@@ -9,6 +9,7 @@ const fakeFont: LoadedFont = {
   ascent: 800,
   descent: -200,
   capHeight: 700,
+  variationAxes: [],
   hasGlyph: () => true,
   outlinePath: () => ({ d: 'M0 0', advance: 500 }),
   layout: (text) => ({
@@ -18,7 +19,8 @@ const fakeFont: LoadedFont = {
       mapped: true,
       outline: ({ x, y }) => `M${x} ${y}`
     }))
-  })
+  }),
+  variant: () => fakeFont
 };
 
 function scene(svg: string) {
