@@ -17,6 +17,7 @@ export function TabDock({
   onDuplicateLayer,
   onMoveLayer,
   onSelectLayer,
+  onToggleExpand,
   onToggleLayerVisible,
   onUploadSvg,
   selectedLabel
@@ -29,6 +30,7 @@ export function TabDock({
   readonly onDuplicateLayer: (layerId: string) => void;
   readonly onMoveLayer: (layerId: string, direction: -1 | 1) => void;
   readonly onSelectLayer: (layerId: string) => void;
+  readonly onToggleExpand: (layerId: string) => void;
   readonly onToggleLayerVisible: (layer: SceneLayer) => void;
   readonly onUploadSvg: (event: ChangeEvent<HTMLInputElement>) => void;
   readonly selectedLabel?: string | undefined;
@@ -130,10 +132,21 @@ export function TabDock({
             {layers.map((layer) => (
               <div
                 key={layer.id}
-                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-1.5 rounded-[7px] border border-transparent bg-transparent py-1 pl-1.5 pr-1 hover:border-border hover:bg-secondary data-[active]:border-primary data-[active]:bg-[color-mix(in_srgb,var(--primary)_13%,transparent)] max-[760px]:grid-cols-[1fr]"
+                className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-1.5 rounded-[7px] border border-transparent bg-transparent py-1 pl-1.5 pr-1 hover:border-border hover:bg-secondary data-[active]:border-primary data-[active]:bg-[color-mix(in_srgb,var(--primary)_13%,transparent)] max-[760px]:grid-cols-[auto_1fr]"
                 data-active={layer.selected || undefined}
                 data-hidden={layer.hidden || undefined}
+                data-depth={layer.depth}
+                style={
+                  layer.depth > 0
+                    ? { paddingLeft: `calc(0.375rem + ${layer.depth * 14}px)` }
+                    : undefined
+                }
               >
+                <LayerDisclosure
+                  expandable={layer.expandable}
+                  expanded={layer.expanded}
+                  onToggle={() => onToggleExpand(layer.id)}
+                />
                 <button
                   type="button"
                   className="flex min-w-0 cursor-pointer items-center gap-2 border-0 bg-transparent px-0.5 py-[5px] text-left text-foreground outline-none focus-visible:outline-offset-2 focus-visible:[outline:2px_solid_var(--ring)] max-[760px]:min-h-[44px]"
@@ -159,7 +172,7 @@ export function TabDock({
                   ) : null}
                 </button>
                 <div
-                  className="flex flex-wrap justify-end gap-1 max-[760px]:justify-start max-[760px]:gap-1.5"
+                  className="flex flex-wrap justify-end gap-1 max-[760px]:col-span-2 max-[760px]:justify-start max-[760px]:gap-1.5"
                   aria-label={`${layer.label} layer actions`}
                 >
                   <LayerAction
@@ -209,6 +222,40 @@ export function TabDock({
         {adjustControls}
       </section>
     </section>
+  );
+}
+
+function LayerDisclosure({
+  expandable,
+  expanded,
+  onToggle
+}: {
+  readonly expandable: boolean;
+  readonly expanded: boolean;
+  readonly onToggle: () => void;
+}) {
+  if (!expandable) {
+    return <span className="h-[26px] w-[18px] shrink-0" aria-hidden="true" />;
+  }
+  const label = expanded ? 'Collapse group' : 'Expand group';
+  return (
+    <button
+      type="button"
+      className="grid h-[26px] w-[18px] shrink-0 place-items-center rounded-md border border-transparent bg-transparent p-0 text-muted-foreground outline-none hover:text-foreground focus-visible:outline-offset-2 focus-visible:[outline:2px_solid_var(--ring)]"
+      aria-label={label}
+      aria-expanded={expanded}
+      title={label}
+      onClick={onToggle}
+    >
+      <svg
+        className="h-[11px] w-[11px] fill-none stroke-current transition-transform [stroke-linecap:round] [stroke-linejoin:round] [stroke-width:2.4] data-[expanded]:rotate-90"
+        viewBox="0 0 24 24"
+        data-expanded={expanded || undefined}
+        aria-hidden="true"
+      >
+        <path d="m9 6 6 6-6 6" />
+      </svg>
+    </button>
   );
 }
 

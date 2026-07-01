@@ -3,17 +3,22 @@ import { serializeSvg } from '@toolbox/svg-core';
 import { scene } from './test-support';
 import {
   addLayer,
+  applyMatrix,
   centerFromMatrix,
   centerInUserSpace,
   centerLayer,
   duplicateLayer,
+  findParentId,
   fitTransform,
   getAdaptiveRole,
   getBackgroundColor,
   getNodeFields,
   getSelectedNode,
+  invertMatrix,
   layerCenter,
   listLayers,
+  multiplyMatrix,
+  newlyAddedId,
   normalizeCanvas,
   removeLayer,
   reorderLayer,
@@ -561,5 +566,105 @@ describe('normalizeCanvas', () => {
 
     expect(fitted.root.viewBox).toEqual([0, 0, 1024, 1024]);
     expect(serializeSvg(fitted)).toContain('translate(100 50)');
+  });
+});
+
+const nested = () =>
+  scene(
+    '<svg viewBox="0 0 24 24"><g id="grp"><rect width="4" height="4" /><circle r="2" /></g><path d="M0 0h4" /></svg>'
+  );
+
+describe('scene-editor nested layers', () => {
+  it('reveals an expanded group\'s children indented and topmost-first', () => {
+    const s = nested();
+    const grpId = s.root.children[0]!.id;
+
+    const layers = listLayers(s, '', new Set([grpId]));
+
+    expect(layers.map((l) => [l.label, l.depth])).toEqual([
+      ['path', 0],
+      ['g#grp', 0],
+      ['circle', 1],
+      ['rect', 1]
+    ]);
+    const group = layers.find((l) => l.label === 'g#grp')!;
+    expect(group.expandable).toBe(true);
+    expect(group.expanded).toBe(true);
+    expect(layers.find((l) => l.label === 'circle')!.parentId).toBe(grpId);
+  });
+
+  it('hides a collapsed group\'s children but still marks it expandable', () => {
+    const s = nested();
+
+    const layers = listLayers(s, '', new Set());
+
+    expect(layers.map((l) => l.label)).toEqual(['path', 'g#grp']);
+    const group = layers.find((l) => l.label === 'g#grp')!;
+    expect(group.expandable).toBe(true);
+    expect(group.expanded).toBe(false);
+  });
+
+  it('defaults to fully collapsed when no expanded set is given', () => {
+    const s = nested();
+    expect(listLayers(s, '').map((l) => l.label)).toEqual(['path', 'g#grp']);
+  });
+
+  it('resolves a nested node id through getSelectedNode', () => {
+    const s = nested();
+    const circleId = s.root.children[0]!.children[1]!.id;
+
+    expect(getSelectedNode(s, circleId)!.tag).toBe('circle');
+  });
+
+  it('finds the parent group of a nested node, and null for a top-level node', () => {
+    const s = nested();
+    const grpId = s.root.children[0]!.id;
+    const rectId = s.root.children[0]!.children[0]!.id;
+
+    expect(findParentId(s, rectId)).toBe(grpId);
+    expect(findParentId(s, grpId)).toBe(null);
+  });
+
+  it('reports the id newly introduced between two scenes', () => {
+    const s = scene('<svg viewBox="0 0 24 24"><rect width="4" height="4" /></svg>');
+    const { scene: next, selectedId } = addLayer(s, 'circle');
+
+    expect(newlyAddedId(s, next)).toBe(selectedId);
+    expect(newlyAddedId(s, s)).toBe(null);
+  });
+
+  it('duplicates an inner layer next to it inside the same group and selects the copy', () => {
+    const s = nested();
+    const grpId = s.root.children[0]!.id;
+    const rectId = s.root.children[0]!.children[0]!.id;
+
+    const { scene: next, selectedId } = duplicateLayer(s, rectId);
+
+    const group = next.root.children.find((n) => n.id === grpId)!;
+    expect(group.children.map((c) => c.tag)).toEqual(['rect', 'rect', 'circle']);
+    expect(selectedId).not.toBe(rectId);
+    expect(group.children.some((c) => c.id === selectedId && c.tag === 'rect')).toBe(true);
+  });
+});
+
+describe('scene-editor affine helpers', () => {
+  const identity = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+
+  it('applies a matrix to a point', () => {
+    expect(applyMatrix(identity, 5, 7)).toEqual({ x: 5, y: 7 });
+    // canvas->parent for a parent placed at translate(10,0) scale(2): parent = (canvas-10)/2
+    const canvasToParent = { a: 0.5, b: 0, c: 0, d: 0.5, e: -5, f: 0 };
+    const p = applyMatrix(canvasToParent, 10, 4);
+    expect(p.x).toBeCloseTo(0, 6);
+    expect(p.y).toBeCloseTo(2, 6);
+  });
+
+  it('inverts and composes matrices back to identity', () => {
+    const m = { a: 2, b: 0, c: 0, d: 0.5, e: 30, f: -10 };
+    const composed = multiplyMatrix(m, invertMatrix(m)!);
+    expect(composed.a).toBeCloseTo(1, 6);
+    expect(composed.d).toBeCloseTo(1, 6);
+    expect(composed.e).toBeCloseTo(0, 6);
+    expect(composed.f).toBeCloseTo(0, 6);
   });
 });

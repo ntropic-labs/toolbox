@@ -34,6 +34,10 @@ export interface SceneLayer {
   readonly selected: boolean;
   readonly adaptiveRole: AdaptiveRole;
   readonly hasCss: boolean;
+  readonly depth: number;
+  readonly parentId: string | null;
+  readonly expandable: boolean;
+  readonly expanded: boolean;
 }
 
 const tagLabels: Record<string, string> = {
@@ -48,11 +52,31 @@ const tagLabels: Record<string, string> = {
   polyline: 'Polyline'
 };
 
-export function listLayers(scene: SvgScene, selectedId: string): readonly SceneLayer[] {
-  return [...scene.root.children].reverse().map((node) => {
+export function listLayers(
+  scene: SvgScene,
+  selectedId: string,
+  expanded: ReadonlySet<string> = new Set()
+): readonly SceneLayer[] {
+  const layers: SceneLayer[] = [];
+  collectLayers(scene, scene.root.children, selectedId, expanded, 0, null, layers);
+  return layers;
+}
+
+function collectLayers(
+  scene: SvgScene,
+  nodes: readonly SvgNode[],
+  selectedId: string,
+  expanded: ReadonlySet<string>,
+  depth: number,
+  parentId: string | null,
+  out: SceneLayer[]
+): void {
+  for (const node of [...nodes].reverse()) {
     const hidden = isHidden(node);
     const adaptiveRole = getAdaptiveRole(node);
-    return {
+    const expandable = node.tag.toLowerCase() === 'g' && node.children.length > 0;
+    const isExpanded = expandable && expanded.has(node.id);
+    out.push({
       id: node.id,
       label: layerLabel(node),
       status: [
@@ -63,9 +87,16 @@ export function listLayers(scene: SvgScene, selectedId: string): readonly SceneL
       hidden,
       selected: node.id === selectedId,
       adaptiveRole,
-      hasCss: layerStylingMayOverride(scene, node.id)
-    };
-  });
+      hasCss: layerStylingMayOverride(scene, node.id),
+      depth,
+      parentId,
+      expandable,
+      expanded: isExpanded
+    });
+    if (isExpanded) {
+      collectLayers(scene, node.children, selectedId, expanded, depth + 1, node.id, out);
+    }
+  }
 }
 
 export function getAdaptiveRole(node: SvgNode): AdaptiveRole {
@@ -79,7 +110,34 @@ export function setAdaptiveRole(scene: SvgScene, id: string, role: AdaptiveRole)
 }
 
 export function getSelectedNode(scene: SvgScene, selectedId: string): SvgNode | null {
-  return scene.root.children.find((node) => node.id === selectedId) ?? null;
+  if (!selectedId) return null;
+  return findNodeById(scene.root.children, selectedId);
+}
+
+function findNodeById(nodes: readonly SvgNode[], id: string): SvgNode | null {
+  for (const node of nodes) {
+    if (node.id === id) return node;
+    const found = findNodeById(node.children, id);
+    if (found) return found;
+  }
+  return null;
+}
+
+export function findParentId(scene: SvgScene, id: string): string | null {
+  return findParentIdIn(scene.root.children, id, null);
+}
+
+function findParentIdIn(
+  nodes: readonly SvgNode[],
+  id: string,
+  parentId: string | null
+): string | null {
+  for (const node of nodes) {
+    if (node.id === id) return parentId;
+    const found = findParentIdIn(node.children, id, node.id);
+    if (found !== null) return found;
+  }
+  return null;
 }
 
 export function addLayer(
@@ -102,17 +160,40 @@ export function duplicateLayer(
   scene: SvgScene,
   id: string
 ): { readonly scene: SvgScene; readonly selectedId: string } {
-  const beforeIds = new Set(scene.root.children.map((node) => node.id));
+  const beforeIds = collectIds(scene.root.children);
   const duplicated = duplicateNode(scene, id);
-  const newNode = duplicated.root.children.find((node) => !beforeIds.has(node.id));
-  if (!newNode) {
+  const newId = firstNewId(duplicated.root.children, beforeIds);
+  if (!newId) {
     return { scene: duplicated, selectedId: id };
   }
+  const newNode = findNodeById(duplicated.root.children, newId);
   const cleaned =
-    newNode.attributes.id === undefined
-      ? duplicated
-      : setAttributes(duplicated, newNode.id, { id: null });
-  return { scene: cleaned, selectedId: newNode.id };
+    newNode && newNode.attributes.id !== undefined
+      ? setAttributes(duplicated, newId, { id: null })
+      : duplicated;
+  return { scene: cleaned, selectedId: newId };
+}
+
+export function newlyAddedId(before: SvgScene, after: SvgScene): string | null {
+  return firstNewId(after.root.children, collectIds(before.root.children));
+}
+
+function collectIds(nodes: readonly SvgNode[]): Set<string> {
+  const ids = new Set<string>();
+  for (const node of nodes) {
+    ids.add(node.id);
+    for (const id of collectIds(node.children)) ids.add(id);
+  }
+  return ids;
+}
+
+function firstNewId(nodes: readonly SvgNode[], before: ReadonlySet<string>): string | null {
+  for (const node of nodes) {
+    if (!before.has(node.id)) return node.id;
+    const nested = firstNewId(node.children, before);
+    if (nested) return nested;
+  }
+  return null;
 }
 
 export function toggleLayerVisible(scene: SvgScene, id: string): SvgScene {
@@ -196,7 +277,15 @@ export function centerFromMatrix(
   };
 }
 
-function invertMatrix(m: AffineMatrix): AffineMatrix | null {
+export function applyMatrix(
+  m: AffineMatrix,
+  x: number,
+  y: number
+): { readonly x: number; readonly y: number } {
+  return { x: m.a * x + m.c * y + m.e, y: m.b * x + m.d * y + m.f };
+}
+
+export function invertMatrix(m: AffineMatrix): AffineMatrix | null {
   const det = m.a * m.d - m.b * m.c;
   if (det === 0 || !Number.isFinite(det)) return null;
   const inv = 1 / det;
@@ -210,7 +299,7 @@ function invertMatrix(m: AffineMatrix): AffineMatrix | null {
   };
 }
 
-function multiplyMatrix(m: AffineMatrix, n: AffineMatrix): AffineMatrix {
+export function multiplyMatrix(m: AffineMatrix, n: AffineMatrix): AffineMatrix {
   return {
     a: m.a * n.a + m.c * n.b,
     b: m.b * n.a + m.d * n.b,

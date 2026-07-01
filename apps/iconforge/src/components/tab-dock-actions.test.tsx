@@ -18,12 +18,53 @@ function renderDock() {
       onDuplicateLayer={() => undefined}
       onMoveLayer={() => undefined}
       onSelectLayer={() => undefined}
+      onToggleExpand={() => undefined}
       onToggleLayerVisible={() => undefined}
       onUploadSvg={() => undefined}
       selectedLabel="rect"
     />
   );
 }
+
+function renderNestedDock() {
+  const parsed = parseSvg(
+    '<svg viewBox="0 0 24 24"><g id="grp"><rect width="4" height="4" /><circle r="2" /></g></svg>'
+  );
+  const scene = parsed.scene!;
+  const grpId = scene.root.children[0]!.id;
+  const layers = listLayers(scene, grpId, new Set([grpId]));
+  return renderToStaticMarkup(
+    <TabDock
+      adjustControls={<div>Adjust controls</div>}
+      documentControls={<div>Document controls</div>}
+      layers={layers}
+      onAddNode={() => undefined}
+      onDeleteLayer={() => undefined}
+      onDuplicateLayer={() => undefined}
+      onMoveLayer={() => undefined}
+      onSelectLayer={() => undefined}
+      onToggleExpand={() => undefined}
+      onToggleLayerVisible={() => undefined}
+      onUploadSvg={() => undefined}
+      selectedLabel="g#grp"
+    />
+  );
+}
+
+describe('nested group layers', () => {
+  it('offers a collapse control on an expanded group row', () => {
+    const html = renderNestedDock();
+    expect(html).toContain('aria-label="Collapse group"');
+  });
+
+  it('indents the inner layers by depth', () => {
+    const html = renderNestedDock();
+    expect(html).toContain('data-depth="1"');
+    for (const label of ['rect', 'circle']) {
+      expect(html).toContain(label);
+    }
+  });
+});
 
 describe('layer action layout', () => {
   it('shows every layer action inline as a button, not behind a menu', () => {

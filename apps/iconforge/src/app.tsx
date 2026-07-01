@@ -39,26 +39,30 @@ import {
 } from './storage';
 import {
   addLayer,
+  applyMatrix,
   centerInUserSpace,
-  centerLayer,
   duplicateLayer,
+  findParentId,
   fitTransform,
   getBackgroundColor,
   getSelectedNode,
+  invertMatrix,
   layerCenter,
   listLayers,
+  multiplyMatrix,
+  newlyAddedId,
   normalizeCanvas,
   removeLayer,
   reorderLayer,
   setAdaptiveRole,
   setBackgroundColor,
-  setLayerCenter,
   setLayerCenterPoint,
   setLayerRotation,
   setNodeText,
   toggleLayerVisible,
   updateNodeField,
   type AdaptiveRole,
+  type AffineMatrix,
   type LayerBox,
   type SceneLayer,
   type SceneNodeKind
@@ -198,7 +202,21 @@ export function App() {
 
   useKeyboard({ scene, selectedId, commit, undo, redo });
 
+  const [expandedGroups, setExpandedGroups] = useState<ReadonlySet<string>>(() => new Set());
+  const toggleExpand = useCallback((id: string) => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
   const selectedNode = getSelectedNode(scene, selectedId);
+  const selectedParentId = useMemo(
+    () => (selectedId ? findParentId(scene, selectedId) : null),
+    [scene, selectedId]
+  );
 
   const [fontsReadyTick, setFontsReadyTick] = useState(0);
   useEffect(() => {
@@ -217,12 +235,19 @@ export function App() {
   }, []);
 
   const measurement = useMemo(
-    () => (selectedNode ? measureLayer(scene, selectedId) : null),
+    () => (selectedNode ? measureLayer(scene, selectedId, selectedParentId) : null),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedNode, scene, selectedId, fontsReadyTick]
+    [selectedNode, scene, selectedId, selectedParentId, fontsReadyTick]
   );
   const selectedBox = measurement?.bbox ?? null;
   const selectedCenter = measurement?.center ?? null;
+  const toParent = measurement?.toParent ?? null;
+
+  const toParentSpace = useCallback(
+    (point: { readonly x: number; readonly y: number }) =>
+      toParent ? applyMatrix(toParent, point.x, point.y) : point,
+    [toParent]
+  );
 
   const selectedRotation = selectedNode
     ? parseTransform(selectedNode.attributes.transform).rotate
@@ -327,7 +352,12 @@ export function App() {
     }
     const result = outlineSvgSceneText(scene, { nodeId: selectedNode.id, font });
     commit(result.scene);
-  }, [selectedNode, scene, commit]);
+    const groupId = newlyAddedId(scene, result.scene);
+    if (groupId) {
+      setSelectedId(groupId);
+      setExpandedGroups((prev) => new Set(prev).add(groupId));
+    }
+  }, [selectedNode, scene, commit, setSelectedId]);
 
   const shadow = selectedNode ? getTextShadow(scene, selectedNode.id) : null;
 
@@ -375,13 +405,17 @@ export function App() {
 
   const deleteLayerById = useCallback(
     (id: string) => {
-      const layer = listLayers(scene, selectedId).find((candidate) => candidate.id === id);
+      const layer = listLayers(scene, selectedId, expandedGroups).find(
+        (candidate) => candidate.id === id
+      );
+      const parentId = findParentId(scene, id);
       commit(removeLayer(scene, id));
+      if (id === selectedId && parentId) setSelectedId(parentId);
       if (layer) {
         showNotice(getLayerDeletedNotice(layer.label));
       }
     },
-    [commit, scene, selectedId]
+    [commit, scene, selectedId, expandedGroups, setSelectedId]
   );
 
   function addShape(kind: SceneNodeKind) {
@@ -424,9 +458,10 @@ export function App() {
   }
 
   function centerSelected() {
-    if (!selectedId) return;
-    const bbox = measureLayer(scene, selectedId)?.bbox;
-    if (bbox) commit(centerLayer(scene, selectedId, bbox));
+    if (!selectedId || !selectedBox) return;
+    const [vx, vy, vw, vh] = scene.root.viewBox;
+    const target = toParentSpace({ x: vx + vw / 2, y: vy + vh / 2 });
+    commit(setLayerCenterPoint(scene, selectedId, selectedBox, target.x, target.y));
   }
 
   function fitCanvas() {
@@ -434,8 +469,11 @@ export function App() {
   }
 
   function setCenter(axis: 'x' | 'y', value: number) {
-    if (!selectedId || !selectedBox) return;
-    commit(setLayerCenter(scene, selectedId, selectedBox, axis, value));
+    if (!selectedId || !selectedBox || !selectedCenter) return;
+    const targetCanvas =
+      axis === 'x' ? { x: value, y: selectedCenter.y } : { x: selectedCenter.x, y: value };
+    const target = toParentSpace(targetCanvas);
+    commit(setLayerCenterPoint(scene, selectedId, selectedBox, target.x, target.y));
   }
 
   function setRotation(degrees: number) {
@@ -483,7 +521,7 @@ export function App() {
     scene.root.width === undefined &&
     scene.root.height === undefined;
 
-  const layers = listLayers(scene, selectedId);
+  const layers = listLayers(scene, selectedId, expandedGroups);
   const selectedLabel = selectedNode
     ? (layers.find((layer) => layer.id === selectedId)?.label ?? selectedNode.tag)
     : undefined;
@@ -624,6 +662,7 @@ export function App() {
           onDuplicateLayer={duplicate}
           onMoveLayer={reorder}
           onSelectLayer={setSelectedId}
+          onToggleExpand={toggleExpand}
           onToggleLayerVisible={toggleVisible}
           onUploadSvg={(event) => void uploadSvg(event)}
           selectedLabel={selectedLabel}
@@ -652,9 +691,14 @@ const sizeFieldNames = new Set(['scale', 'width', 'height', 'rx', 'ry', 'r', 'fo
 interface LayerMeasurement {
   readonly bbox: LayerBox;
   readonly center: { readonly x: number; readonly y: number };
+  readonly toParent: AffineMatrix | null;
 }
 
-function measureLayer(scene: SvgScene, id: string): LayerMeasurement | null {
+function measureLayer(
+  scene: SvgScene,
+  id: string,
+  parentId: string | null = null
+): LayerMeasurement | null {
   if (typeof document === 'undefined') return null;
   const holder = document.createElement('div');
   holder.style.cssText =
@@ -666,12 +710,29 @@ function measureLayer(scene: SvgScene, id: string): LayerMeasurement | null {
     if (!element || typeof element.getBBox !== 'function') return null;
     const box = element.getBBox();
     const bbox = { x: box.x, y: box.y, width: box.width, height: box.height };
-    return { bbox, center: renderedCenter(element, bbox) ?? fallbackCenter(scene, id, bbox) };
+    return {
+      bbox,
+      center: renderedCenter(element, bbox) ?? fallbackCenter(scene, id, bbox),
+      toParent: parentId ? canvasToParentMatrix(holder, element, parentId) : null
+    };
   } catch {
     return null;
   } finally {
     holder.remove();
   }
+}
+
+function canvasToParentMatrix(
+  holder: HTMLElement,
+  element: SVGGraphicsElement,
+  parentId: string
+): AffineMatrix | null {
+  const parent = holder.querySelector<SVGGraphicsElement>(`[data-fid="${parentId}"]`);
+  const parentCtm = parent?.getScreenCTM?.();
+  const rootCtm = element.ownerSVGElement?.getScreenCTM?.();
+  if (!parentCtm || !rootCtm) return null;
+  const parentInverse = invertMatrix(parentCtm);
+  return parentInverse ? multiplyMatrix(parentInverse, rootCtm) : null;
 }
 
 function renderedCenter(
