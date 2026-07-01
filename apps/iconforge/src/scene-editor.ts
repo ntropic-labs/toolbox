@@ -17,6 +17,7 @@ import {
   type TransformParts
 } from './node-primitives';
 import { layerStylingMayOverride } from './css-notice';
+import { writeStyleProperty } from './style-attr';
 
 export { getNodeFields } from './node-primitives';
 
@@ -226,6 +227,17 @@ export function updateNodeField(
     return setAttributes(scene, id, { transform: transform.length === 0 ? null : transform });
   }
   return setAttributes(scene, id, { [name]: value.trim().length === 0 ? null : value });
+}
+
+export function setStyleProperty(
+  scene: SvgScene,
+  id: string,
+  prop: string,
+  value: string
+): SvgScene {
+  const node = getSelectedNode(scene, id);
+  const next = writeStyleProperty(node?.attributes.style, prop, value.length === 0 ? null : value);
+  return setAttributes(scene, id, { style: next.length === 0 ? null : next });
 }
 
 export interface LayerBox {

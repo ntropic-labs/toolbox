@@ -28,6 +28,7 @@ import {
   setLayerCenterPoint,
   setLayerRotation,
   setNodeText,
+  setStyleProperty,
   toggleLayerVisible,
   updateNodeField
 } from './scene-editor';
@@ -666,5 +667,18 @@ describe('scene-editor affine helpers', () => {
     expect(composed.d).toBeCloseTo(1, 6);
     expect(composed.e).toBeCloseTo(0, 6);
     expect(composed.f).toBeCloseTo(0, 6);
+  });
+});
+
+describe('setStyleProperty', () => {
+  it('writes and clears text-transform in the style attribute', () => {
+    const s = scene('<svg viewBox="0 0 24 24"><text x="2" y="20">Hi</text></svg>');
+    const id = s.root.children[0]!.id;
+
+    const upper = setStyleProperty(s, id, 'text-transform', 'uppercase');
+    expect(getSelectedNode(upper, id)!.attributes.style).toBe('text-transform:uppercase');
+
+    const cleared = setStyleProperty(upper, id, 'text-transform', '');
+    expect(getSelectedNode(cleared, id)!.attributes.style).toBeUndefined();
   });
 });
