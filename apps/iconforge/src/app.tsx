@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { exportPngSizeChoices, framedScene, planExport } from '@toolbox/export-engine';
-import { outlineSvgSceneText, sceneToComponent } from '@toolbox/svg-ops';
+import { outlineSvgSceneText, sceneToComponent, type FontAxis } from '@toolbox/svg-ops';
 import { addNode, createElementNode, parseSvg, type SvgScene } from '@toolbox/svg-core';
 import { renderToMarkup } from '@toolbox/svg-render';
 import { AdjustTab, DocumentControls, type FontStatus } from './components/adjust-tab';
@@ -59,6 +59,7 @@ import {
   setLayerCenterPoint,
   setLayerRotation,
   setNodeText,
+  setStyleProperty,
   toggleLayerVisible,
   updateNodeField,
   type AdaptiveRole,
@@ -378,6 +379,21 @@ export function App() {
     return [...new Set(all)];
   }, [loadedFamilies, selectedFontFamily]);
 
+  const selectedFontAxes = useMemo<readonly FontAxis[]>(() => {
+    const font = selectedFontFamily ? getLoadedFont(selectedFontFamily) : null;
+    return font?.variationAxes ?? [];
+    // getLoadedFont reads a non-reactive registry; loadedFamilies forces a recompute
+    // when a font finishes loading for an already-set font-family.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFontFamily, loadedFamilies]);
+
+  const setTextTransform = useCallback(
+    (value: string) => {
+      if (selectedId) commit(setStyleProperty(scene, selectedId, 'text-transform', value));
+    },
+    [selectedId, scene, commit]
+  );
+
   useEffect(() => {
     const preload = () => {
       preloadCodeEditor();
@@ -654,6 +670,8 @@ export function App() {
               onConvertToShapes={convertToShapes}
               shadow={shadow}
               onSetShadow={setShadow}
+              fontAxes={selectedFontAxes}
+              onSetTextTransform={setTextTransform}
             />
           }
           layers={layers}

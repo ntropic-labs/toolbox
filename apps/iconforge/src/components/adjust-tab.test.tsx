@@ -197,6 +197,23 @@ describe('AdjustTab text controls', () => {
     const html = renderToStaticMarkup(<AdjustTab node={node} {...textProps} />);
     expect(html).not.toContain('Convert to shapes');
   });
+
+  it('renders the Type controls with axis sliders for a text node', () => {
+    const node = firstNode(
+      '<svg viewBox="0 0 24 24"><text font-family="Oswald" x="2" y="20">Hi</text></svg>'
+    );
+    const html = renderToStaticMarkup(
+      <AdjustTab
+        node={node}
+        {...textProps}
+        fontAxes={[{ tag: 'wght', name: 'Weight', min: 200, default: 400, max: 700 }]}
+        onSetTextTransform={noop}
+      />
+    );
+    expect(html).toContain('Weight');
+    expect(html).toContain('Case');
+    expect(html).toContain('Decoration');
+  });
 });
 
 describe('AdjustTab CSS override warning', () => {

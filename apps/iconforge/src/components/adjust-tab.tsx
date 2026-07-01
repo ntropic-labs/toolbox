@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { HexColorInput, HexColorPicker } from 'react-colorful';
 import type { SvgNode } from '@toolbox/svg-core';
+import type { FontAxis } from '@toolbox/svg-ops';
 import { Alert, Button, cn, Popover, PopoverContent, PopoverTrigger } from '@toolbox/ui';
 import { getAdaptiveRole, getNodeFields, type AdaptiveRole } from '../scene-editor';
 import type { TextShadow } from '../text-effects';
@@ -14,6 +15,7 @@ import {
   SegmentedControl,
   Toggle
 } from './fields';
+import { TextTypeControls } from './text-type-controls';
 
 export function DocumentControls({
   backgroundColor,
@@ -139,7 +141,9 @@ export function AdjustTab({
   onSelectFont,
   onConvertToShapes,
   shadow,
-  onSetShadow
+  onSetShadow,
+  fontAxes,
+  onSetTextTransform
 }: {
   readonly node: SvgNode | null;
   readonly stylingMayOverride?: boolean;
@@ -162,6 +166,8 @@ export function AdjustTab({
   readonly onConvertToShapes?: () => void;
   readonly shadow?: TextShadow | null;
   readonly onSetShadow?: (shadow: TextShadow | null) => void;
+  readonly fontAxes?: readonly FontAxis[];
+  readonly onSetTextTransform?: (value: string) => void;
 }) {
   if (!node) {
     return (
@@ -402,6 +408,15 @@ export function AdjustTab({
           <div className="text-[9.5px] font-medium uppercase tracking-[0.16em] text-muted-foreground">Appearance</div>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(92px,1fr))] gap-[9px] [&>[data-wide]]:col-span-2">{appearanceFields.map(renderField)}</div>
         </div>
+      ) : null}
+
+      {isTextNode && onSetTextTransform ? (
+        <TextTypeControls
+          node={node}
+          axes={fontAxes ?? []}
+          onUpdateField={onUpdateField}
+          onSetTextTransform={onSetTextTransform}
+        />
       ) : null}
 
       <div className="grid gap-2">
