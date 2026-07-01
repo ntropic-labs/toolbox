@@ -8,6 +8,8 @@ export { loadFromBuffer } from './parse-font';
 export type {
   LoadedFont,
   LoadFontOptions,
+  FontAxis,
+  GlyphSource,
   GlyphRun,
   RunGlyph,
   GlyphPlacement,

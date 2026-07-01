@@ -1,4 +1,10 @@
-import type { GlyphPlacement, LoadFontOptions, LoadedFont } from './loaded-font';
+import type {
+  FontAxis,
+  GlyphPlacement,
+  GlyphSource,
+  LoadFontOptions,
+  LoadedFont
+} from './loaded-font';
 
 export async function loadFromBuffer(
   buffer: ArrayBuffer,
@@ -19,13 +25,28 @@ async function parseFontBuffer(
   if ('fonts' in parsed) {
     throw new Error(`${name} is a font collection; choose a single font file.`);
   }
+  const base = parsed;
 
-  let font = parsed;
-  if (options.weight !== undefined && 'wght' in font.variationAxes) {
-    font = font.getVariation({ wght: options.weight });
-  }
+  const variationAxes: FontAxis[] = Object.entries(base.variationAxes).map(([tag, axis]) => ({
+    tag,
+    name: axis!.name,
+    min: axis!.min,
+    default: axis!.default,
+    max: axis!.max
+  }));
+  const axisTags = new Set(variationAxes.map((axis) => axis.tag));
 
-  return {
+  const filterVariations = (
+    variations: Readonly<Record<string, number>>
+  ): Record<string, number> => {
+    const out: Record<string, number> = {};
+    for (const [tag, value] of Object.entries(variations)) {
+      if (axisTags.has(tag) && Number.isFinite(value)) out[tag] = value;
+    }
+    return out;
+  };
+
+  const makeSource = (font: typeof base): GlyphSource => ({
     familyName: font.familyName ?? name,
     unitsPerEm: font.unitsPerEm,
     ascent: font.ascent,
@@ -63,7 +84,29 @@ async function parseFontBuffer(
         }))
       };
     }
+  });
+
+  const defaultVariations = filterVariations(
+    options.variations ?? (options.weight !== undefined ? { wght: options.weight } : {})
+  );
+  const defaultSource = makeSource(
+    Object.keys(defaultVariations).length > 0 ? base.getVariation(defaultVariations) : base
+  );
+
+  const sourceCache = new Map<string, GlyphSource>();
+  const variant = (variations: Readonly<Record<string, number>>): GlyphSource => {
+    const filtered = filterVariations(variations);
+    const keys = Object.keys(filtered).sort();
+    if (keys.length === 0) return defaultSource;
+    const key = keys.map((tag) => `${tag}:${filtered[tag]}`).join(',');
+    const cached = sourceCache.get(key);
+    if (cached) return cached;
+    const source = makeSource(base.getVariation(filtered));
+    sourceCache.set(key, source);
+    return source;
   };
+
+  return { ...defaultSource, variationAxes, variant };
 }
 
 interface GlyphPathCommand {

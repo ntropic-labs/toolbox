@@ -20,7 +20,15 @@ export interface GlyphRun {
   readonly glyphs: readonly RunGlyph[];
 }
 
-export interface LoadedFont {
+export interface FontAxis {
+  readonly tag: string;
+  readonly name: string;
+  readonly min: number;
+  readonly default: number;
+  readonly max: number;
+}
+
+export interface GlyphSource {
   readonly familyName: string;
   readonly unitsPerEm: number;
   readonly ascent: number;
@@ -31,6 +39,12 @@ export interface LoadedFont {
   layout(text: string): GlyphRun;
 }
 
+export interface LoadedFont extends GlyphSource {
+  readonly variationAxes: readonly FontAxis[];
+  variant(variations: Readonly<Record<string, number>>): GlyphSource;
+}
+
 export interface LoadFontOptions {
   readonly weight?: number;
+  readonly variations?: Readonly<Record<string, number>>;
 }
