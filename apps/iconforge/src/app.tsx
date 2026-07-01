@@ -74,6 +74,7 @@ import { loadFontFromFile, loadGoogleFont } from './fonts/load-font';
 import { presetFontFamilies } from './fonts/presets';
 import type { LoadedFont } from '@toolbox/svg-ops';
 import { getLoadedFont } from './fonts/font-registry';
+import { reconcileTextAxes } from './reconcile-text-axes';
 import { getTextShadow, setTextShadow, type TextShadow } from './text-effects';
 import { useTheme } from './hooks/use-theme';
 import { useSceneHistory } from './hooks/use-scene-history';
@@ -287,7 +288,8 @@ export function App() {
   const finishFontLoad = useCallback(
     (font: LoadedFont) => {
       if (!selectedId) return;
-      commit(updateNodeField(getPresent(), selectedId, 'font-family', font.familyName));
+      const withFamily = updateNodeField(getPresent(), selectedId, 'font-family', font.familyName);
+      commit(reconcileTextAxes(withFamily, selectedId, font.variationAxes));
       setLoadedFamilies((prev) =>
         prev.includes(font.familyName) ? prev : [...prev, font.familyName]
       );
